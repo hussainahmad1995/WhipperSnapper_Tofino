@@ -18,15 +18,9 @@ from packet_modification.bm_modification import benchmark_modification_16
 from action_complexity.bm_mod_field import benchmark_field_write_16
 
 
-features = ['parse-header', 'parse-field', 'parse-complex', # Parsing
-            'set-field',                                    # Action complexity
-            'add-header', 'rm-header',                      # Packet Modification
-            'pipeline',                                     # Processing Pipeline
-            'read-state', 'write-state'                     # State Access
+features = [                                   
+            'add-header'                      # Packet Modification
             ]
-
-versions = [ '14','16' ]
-
 def main():
     parser = argparse.ArgumentParser(description='A programs that generate a'
                             ' P4 program for benchmarking a particular feature')

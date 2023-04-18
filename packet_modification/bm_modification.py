@@ -47,6 +47,7 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
 
     fwd_tbl = 'forward_table'
 
+    #Adds parser
     program  = add_headers_and_parsers_16(nb_headers, nb_fields)
     actions = ''
 
@@ -68,7 +69,8 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
     applies = '\t\tforward_table.apply();\n\t\t%s.apply();' %table_name
     arguments = 'inout headers hdr, inout metadata meta, out ingress_intrinsic_metadata_t  ig_intr_md'
 
-    program += add_control_block_16('ingress', actions, tables, applies, arguments)
+    program += add_control_block_16('Ingress', actions, tables, applies, arguments)
+    program += add_control_block_16("IngressDeparser" ,'','',applies, arguments)
     program += add_control_block_16('egress', '', '', '', arguments)
 
     applies = '\t\tpacket.emit(hdr.ethernet);\n'

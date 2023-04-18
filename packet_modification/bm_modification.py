@@ -47,7 +47,7 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
 
     fwd_tbl = 'forward_table'
 
-    #Adds parser
+    #Ingress() parser
     program  = add_headers_and_parsers_16(nb_headers, nb_fields)
     actions = ''
 
@@ -66,23 +66,66 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
     table_name = 'test_tbl'
     tables += add_table_no_match(table_name, '\t\t\t{0};'.format(action_name))
 
-    applies = '\t\tforward_table.apply();\n\t\t%s.apply();' %table_name
-    arguments = 'inout headers hdr, inout metadata meta, out ingress_intrinsic_metadata_t  ig_intr_md'
+    #Ingress() control block arguments and apply block statements
+    Ingressapplies = '\t\tforward_table.apply();\n\t\t%s.apply();' %table_name
+    Ingress_arguments = '''
+        inout my_ingress_headers_t                          hdr,
+        inout my_ingress_metadata_t                         meta,
+        in    ingress_intrinsic_metadata_t               ig_intr_md,
+        in    ingress_intrinsic_metadata_from_parser_t   ig_prsr_md,
+        inout ingress_intrinsic_metadata_for_deparser_t  ig_dprsr_md,
+        inout ingress_intrinsic_metadata_for_tm_t        ig_tm_md'''
+        
+    program += add_control_block_16('Ingress', actions, tables, Ingressapplies, Ingress_arguments)
 
-    program += add_control_block_16('Ingress', actions, tables, applies, arguments)
-    program += add_control_block_16("IngressDeparser" ,'','',applies, arguments)
-    program += add_control_block_16('egress', '', '', '', arguments)
+    #IngressDeparser() control block arguments and apply statements
 
-    applies = '\t\tpacket.emit(hdr.ethernet);\n'
-    applies += '\t\tpacket.emit(hdr.ptp);\n'
+    Ingress_deparser_arguments = """
+        packet_out pkt,
+        inout my_ingress_headers_t                       hdr,
+        in    my_ingress_metadata_t                      meta,
+        in    ingress_intrinsic_metadata_for_deparser_t  ig_dprsr_md"""
+
+    Ingress_deparser_applies = "\t\tpkt.emit(hdr);"
+    program += add_control_block_16("IngressDeparser" ,'','',Ingress_deparser_applies, Ingress_deparser_arguments)
+
+
+    #EgressParser()
+
+    #Egress() control block arguments 
+    egress_arguments = """    
+    inout my_egress_headers_t                          hdr,
+    inout my_egress_metadata_t                         meta,
+    in    egress_intrinsic_metadata_t                  eg_intr_md,
+    in    egress_intrinsic_metadata_from_parser_t      eg_prsr_md,
+    inout egress_intrinsic_metadata_for_deparser_t     eg_dprsr_md,
+    inout egress_intrinsic_metadata_for_output_port_t  eg_oport_md
+    """
+    program += add_control_block_16('Egress', '', '', '', egress_arguments)
+
+
+    #EgressDeparser() block arguments and apply statements
+
+    egress_deparser_arguments = """
+    packet_out pkt,
+    /* User */
+    inout my_egress_headers_t                       hdr,
+    in    my_egress_metadata_t                      meta,
+    /* Intrinsic */
+    in    egress_intrinsic_metadata_for_deparser_t  eg_dprsr_md
+    """
+
+    egress_deparser_applies = '\t\tpacket.emit(hdr.ethernet);\n'
+    egress_deparser_applies += '\t\tpacket.emit(hdr.ptp);\n'
 
     for i in range(nb_headers):
-        applies += '\t\tpacket.emit(hdr.header_%d);\n' % i
+        egress_deparser_applies += '\t\tpacket.emit(hdr.header_%d);\n' % i
 
-    program += add_control_block_16('DeparserImpl', '', '', applies, 'packet_out packet, in headers hdr')
+    program += add_control_block_16('MyEgressDeparser', '', '', egress_deparser_applies, egress_deparser_arguments)
 
-    program += add_control_block_16('verifyChecksum', '', '', '', 'inout headers hdr, inout metadata meta')
-    program += add_control_block_16('computeChecksum', '', '', '', 'inout headers hdr, inout metadata meta')
+    #Tofino does not support checksum
+    # program += add_control_block_16('verifyChecksum', '', '', '', 'inout headers hdr, inout metadata meta')
+    # program += add_control_block_16('computeChecksum', '', '', '', 'inout headers hdr, inout metadata meta')
 
     program += add_main_module()
 

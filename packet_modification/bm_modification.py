@@ -66,7 +66,7 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
     tables += add_table_no_match(table_name, '\t\t\t{0};'.format(action_name))
 
     applies = '\t\tforward_table.apply();\n\t\t%s.apply();' %table_name
-    arguments = 'inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata'
+    arguments = 'inout headers hdr, inout metadata meta, out ingress_intrinsic_metadata_t  ig_intr_md'
 
     program += add_control_block_16('ingress', actions, tables, applies, arguments)
     program += add_control_block_16('egress', '', '', '', arguments)

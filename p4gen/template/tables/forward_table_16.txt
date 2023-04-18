@@ -1,8 +1,8 @@
     action forward(bit<9> port) {
-        standard_metadata.egress_spec = port;
+       ig_intr_md.egress_spec = port;
     }
     action _drop() {
-        mark_to_drop();
+        ig_dprsr_md.drop_ctl = 1;
     }    
     table $table_name {
         actions = {

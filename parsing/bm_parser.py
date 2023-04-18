@@ -170,7 +170,7 @@ def add_ingress_block_16():
     actions = ''
     tables = forward_table_16()
     applies = '\t\tforward_table.apply();\n'
-    arguments = 'inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata'
+    arguments = 'inout headers hdr, inout metadata meta, out ingress_intrinsic_metadata_t  ig_intr_md'
 
     return add_control_block_16('ingress', actions, tables, applies, arguments)
 
@@ -274,7 +274,7 @@ def parser_complexity_16(depth, fanout):
 
     program += add_ingress_block_16()
 
-    arguments = 'inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata'
+    arguments = 'inout headers hdr, inout metadata meta, out ingress_intrinsic_metadata_t  ig_intr_md'
     program += add_control_block_16('egress', '', '', '', arguments)
 
     applies = '\t\tpacket.emit(hdr.ethernet);\n'
@@ -444,7 +444,7 @@ def benchmark_parser_header_16(nb_headers, nb_fields, do_checksum=False):
     program  = add_headers_and_parsers_16(nb_headers, nb_fields, do_checksum)
     program += add_ingress_block_16()
 
-    arguments = 'inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata'
+    arguments = 'inout headers hdr, inout metadata meta, out ingress_intrinsic_metadata_t  ig_intr_md'
     program += add_control_block_16('egress', '', '', '', arguments)
 
     applies = '\t\tpacket.emit(hdr.ethernet);\n'
@@ -508,7 +508,7 @@ def benchmark_parser_with_header_field_16(nb_fields, do_checksum=False):
     program  = add_headers_and_parsers_16(nb_headers, nb_fields, do_checksum)
     program += add_ingress_block_16()
 
-    arguments = 'inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata'
+    arguments = 'inout headers hdr, inout metadata meta, out ingress_intrinsic_metadata_t  ig_intr_md'
     program += add_control_block_16('egress', '', '', '', arguments)
 
     applies = '\t\tpacket.emit(hdr.ethernet);\n'

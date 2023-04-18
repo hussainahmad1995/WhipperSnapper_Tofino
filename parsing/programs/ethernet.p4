@@ -22,7 +22,7 @@ action _drop() {
 }
 
 action forward(port) {
-    modify_field(standard_metadata.egress_spec, port);
+    modify_field(ig_intr_md.egress_spec, port);
 }
 
 table forward_table {

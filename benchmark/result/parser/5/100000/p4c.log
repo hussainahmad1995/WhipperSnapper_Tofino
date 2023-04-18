@@ -1,0 +1,8 @@
+('System arguments ', ['output/main.p4', '--json', 'output/main.json'])
+<bound method ArgumentParser.print_help of ArgumentParser(prog='__main__.py', usage=None, description='p4c-bm arguments', version=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True)>
+('Arguments from the parser ', Namespace(field_aliases=None, json='output/main.json', keep_pragmas=False, openflow_mapping_dir=None, openflow_mapping_mod=None, p4_prefix='prog', p4_v1.1=False, pd=None, pd_from_json=False, plugin_list=[], primitives=[], source='output/main.p4'))
+('Unparsed arguments from the parser', [])
+parsing successful
+semantic checking successful
+Header type standard_metadata_t not byte-aligned, adding padding
+Generating json output to /home/tna-model/hussain/CS6450project/Whippersnapper-2.0/benchmark/output/main.json

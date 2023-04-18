@@ -7,6 +7,27 @@ from p4gen.genpcap import get_packetmod_pcap
 from p4gen import copy_scripts
 from p4gen.p4template import *
 
+
+def benchmark_add_header_overhead_16(action_name, nb_header):
+    instruction_set =''
+    for i in range(nb_header):
+        instruction_set += '\t\thdr.header_%d.setValid();\n' % i
+    instruction_set += '\t\thdr.ptp.reserved2 = 8w1;'
+    return add_compound_action(action_name, '', instruction_set)
+
+def benchmark_remove_header_overhead_16(action_name, nb_header):
+    instruction_set =''
+    for i in range(nb_header):
+        instruction_set += '\t\thdr.header_%d.setInvalid();\n' % i
+    instruction_set += '\t\thdr.ptp.reserved2 = 8w0;'
+    return add_compound_action(action_name, '', instruction_set)
+
+def benchmark_modify_header_overhead_16(action_name, nb_header):
+    instruction_set =''
+    for i in range(nb_header):
+        instruction_set += '\t\thdr.header_{0}.field_0 = hdr.header_{0}.field_0 + 1;\n'.format(i)
+    return add_compound_action(action_name, '', instruction_set)
+
 def benchmark_modification_16(nb_headers, nb_fields, mod_type):
     """
     This method generate the P4 program to benchmark packet modification
@@ -72,6 +93,4 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
         out.write(commands)
     copy_scripts(out_dir)
     get_packetmod_pcap(nb_headers, nb_fields, mod_type, out_dir)
-    generate_pisces_command(nb_headers, out_dir, mod_type)
-
     return program

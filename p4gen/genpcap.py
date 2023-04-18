@@ -4,11 +4,8 @@ from scapy.all import Packet, ShortField, XBitField, IntField
 from scapy.all import Ether, IP, UDP, Padding
 from scapy.all import wrpcap, bind_layers
 
-class PTP(Packet):
 
 # bind_layers(UDP, PTP, dport=319)
-bind_layers(Ether, PTP, type=0x88F7)
-
 
 def add_eth_ip_udp_headers(dport):
     eth = Ether(src='0C:C4:7A:A3:25:34', dst='0C:C4:7A:A3:25:35')
@@ -103,18 +100,15 @@ def get_packetmod_pcap(nb_headers, nb_fields, mod_type, out_dir, packet_size=256
     pkt = Packet()
     if mod_type == 'add':
         eth = Ether(src='0C:C4:7A:A3:25:34', dst='0C:C4:7A:A3:25:35')
-        ptp = PTP(reserved2=0)
-        pkt = eth / ptp / '0x0' * 6
+        pkt = eth 
     elif mod_type == 'rm':
         eth = Ether(src='0C:C4:7A:A3:25:34', dst='0C:C4:7A:A3:25:35')
-        ptp = PTP(reserved2=1)
-        pkt = eth / ptp
+        pkt = eth 
         pkt /= add_layers(nb_fields, nb_headers)
         pkt = add_padding(pkt, packet_size)
     elif mod_type == 'mod':
         eth = Ether(src='0C:C4:7A:A3:25:34', dst='0C:C4:7A:A3:25:35')
-        ptp = PTP(reserved2=1)
-        pkt = eth / ptp
+        pkt = eth 
         pkt /= add_layers(nb_fields, nb_headers)
         pkt = add_padding(pkt, packet_size)
 

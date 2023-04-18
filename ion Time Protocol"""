@@ -1,0 +1,271 @@
+[1mdiff --git a/p4gen/genpcap.py b/p4gen/genpcap.py[m
+[1mindex 1352468..6d62e79 100644[m
+[1m--- a/p4gen/genpcap.py[m
+[1m+++ b/p4gen/genpcap.py[m
+[36m@@ -4,29 +4,8 @@[m [mfrom scapy.all import Packet, ShortField, XBitField, IntField[m
+ from scapy.all import Ether, IP, UDP, Padding[m
+ from scapy.all import wrpcap, bind_layers[m
+ [m
+[31m-class PTP(Packet):[m
+[31m-    """Precision Time Protocol"""[m
+[31m-    name = "PTP protocol"[m
+[31m-    fields_desc = [[m
+[31m-        XBitField('transportSpecific', 0x1, 4),[m
+[31m-        XBitField('messageType', 0x0, 4),[m
+[31m-        XBitField('reserved', 0x2, 4),[m
+[31m-        XBitField('versionPTP', 0x2, 4),[m
+[31m-        ShortField('messageLength', 0x2C),[m
+[31m-        XBitField('domainNumber', 0x0, 8),[m
+[31m-        XBitField('reserved2', 0x1, 8),[m
+[31m-        ShortField('flags', 0x0),[m
+[31m-        XBitField('correction', 0x0, 64),[m
+[31m-        IntField('reserved3', 0x0),[m
+[31m-        XBitField('sourcePortIdentity', 0x008063FFFF0009BA, 80),[m
+[31m-        ShortField('sequenceId', 0x9E48),[m
+[31m-        XBitField('PTPcontrol', 0x05, 8),[m
+[31m-        XBitField('logMessagePeriod', 0x0F, 8),[m
+[31m-        XBitField('originTimestamp', 0x000045B111510472F9C1, 80)[m
+[31m-    ][m
+[31m-[m
+ # bind_layers(UDP, PTP, dport=319)[m
+[31m-bind_layers(Ether, PTP, type=0x88F7)[m
+[32m+[m[32mbind_layers(Ether, type=0x88F7)[m
+ [m
+ [m
+ def add_eth_ip_udp_headers(dport):[m
+[1mdiff --git a/p4gen/p4bench.py b/p4gen/p4bench.py[m
+[1mindex ee9948d..a7665cb 100755[m
+[1m--- a/p4gen/p4bench.py[m
+[1m+++ b/p4gen/p4bench.py[m
+[36m@@ -1,32 +1,10 @@[m
+ #!/usr/bin/env python[m
+ [m
+ import argparse[m
+[31m-[m
+[31m-from parsing.bm_parser import benchmark_parser_header[m
+[31m-from parsing.bm_parser import benchmark_parser_with_header_field[m
+[31m-from parsing.bm_parser import parser_complexity[m
+[31m-from processing.bm_pipeline import benchmark_pipeline[m
+[31m-from state_access.bm_memory import benchmark_memory[m
+[31m-from packet_modification.bm_modification import benchmark_modification[m
+[31m-from action_complexity.bm_mod_field import benchmark_field_write[m
+[31m-from parsing.bm_parser import benchmark_parser_header_16[m
+[31m-from parsing.bm_parser import benchmark_parser_with_header_field_16[m
+[31m-from parsing.bm_parser import parser_complexity_16[m
+[31m-from processing.bm_pipeline import benchmark_pipeline_16[m
+[31m-from state_access.bm_memory import benchmark_memory_16[m
+ from packet_modification.bm_modification import benchmark_modification_16[m
+[31m-from action_complexity.bm_mod_field import benchmark_field_write_16[m
+[31m-[m
+[31m-[m
+[31m-features = ['parse-header', 'parse-field', 'parse-complex', # Parsing[m
+[31m-            'set-field',                                    # Action complexity[m
+[31m-            'add-header', 'rm-header',                      # Packet Modification[m
+[31m-            'pipeline',                                     # Processing Pipeline[m
+[31m-            'read-state', 'write-state'                     # State Access[m
+[31m-            ][m
+[31m-[m
+[31m-versions = [ '14','16' ][m
+ [m
+[32m+[m[32mfeatures = ['add-header' , "rm-header" ]                     # Packet Modification[m
+[32m+[m[41m            [m
+ def main():[m
+     parser = argparse.ArgumentParser(description='A programs that generate a'[m
+                             ' P4 program for benchmarking a particular feature')[m
+[36m@@ -34,74 +12,17 @@[m [mdef main():[m
+                 help='select a feature for benchmarking')[m
+     parser.add_argument('--checksum', default=False, action='store_true',[m
+                             help='perform update checksum')[m
+[31m-    #Version[m
+[31m-    parser.add_argument('--version', choices=versions,[m
+[31m-                 help= 'select the version for testing')[m
+     # Processing options[m
+     parser.add_argument('--tables', default=1, type=int, help='number of tables')[m
+     parser.add_argument('--table-size', default=1, type=int,[m
+                             help='number of rules in the table')[m
+[31m-    # Parser (Field|Header) and Packet Modification options[m
+[31m-    parser.add_argument('--headers', default=1, type=int, help='number of headers')[m
+[31m-    parser.add_argument('--fields', default=1, type=int, help='number of fields')[m
+[31m-    # Parser Complexity[m
+[31m-    parser.add_argument('--depth', default=1, type=int,[m
+[31m-                            help='the depth of the parse graph')[m
+[31m-    parser.add_argument('--fanout', default=2, type=int,[m
+[31m-                            help='the number of branch of a node in the parse graph')[m
+[31m-    # State Access option[m
+[31m-    parser.add_argument('--registers', default=1, type=int, help='number of registers')[m
+[31m-    parser.add_argument('--nb-element', default=1024, type=int,[m
+[31m-                            help='number of element in a register')[m
+[31m-    parser.add_argument('--element-width', default=32, type=int,[m
+[31m-                            help='the bit width of a register element')[m
+[31m-    # Parser Action complexity[m
+[31m-    parser.add_argument('--operations', default=1, type=int,[m
+[31m-                            help='the number of set-field/read/write operations')[m
+ [m
+     args = parser.parse_args()[m
+ [m
+[31m-    if args.feature == 'parse-header' and args.version == '14':[m
+[31m-        benchmark_parser_header(args.headers, args.fields, do_checksum=args.checksum, )[m
+[31m-    elif args.feature == 'parse-field' and args.version == '14':[m
+[31m-        benchmark_parser_with_header_field(args.fields, do_checksum=args.checksum)[m
+[31m-    elif args.feature == 'parse-complex' and args.version == '14':[m
+[31m-        parser_complexity(args.depth, args.fanout)[m
+[31m-    elif args.feature == 'set-field' and args.version == '14':[m
+[31m-        benchmark_field_write(args.operations, do_checksum=args.checksum)[m
+[31m-    elif args.feature == 'add-header' and args.version == '14':[m
+[31m-        benchmark_modification(args.headers, args.fields, 'add')[m
+[31m-    elif args.feature == 'rm-header' and args.version == '14':[m
+[31m-        benchmark_modification(args.headers, args.fields, 'rm')[m
+[31m-    elif args.feature == 'pipeline' and args.version == '14':[m
+[31m-        benchmark_pipeline(args.tables, args.table_size)[m
+[31m-    elif args.feature == 'read-state' and args.version == '14':[m
+[31m-        benchmark_memory(args.registers, args.element_width, args.nb_element,[m
+[31m-                            args.operations, False)[m
+[31m-    elif args.feature == 'write-state' and args.version == '14':[m
+[31m-        benchmark_memory(args.registers, args.element_width, args.nb_element,[m
+[31m-                            args.operations, True)[m
+[31m-[m
+[31m-    elif args.feature == 'parse-header' and args.version == '16':[m
+[31m-        benchmark_parser_header_16(args.headers, args.fields, do_checksum=args.checksum, )[m
+[31m-    elif args.feature == 'parse-field' and args.version == '16':[m
+[31m-        benchmark_parser_with_header_field_16(args.fields, do_checksum=args.checksum)[m
+[31m-    elif args.feature == 'parse-complex' and args.version == '16':[m
+[31m-        parser_complexity_16(args.depth, args.fanout)[m
+[31m-    elif args.feature == 'set-field' and args.version == '16':[m
+[31m-        benchmark_field_write_16(args.operations, do_checksum=args.checksum)[m
+[31m-    elif args.feature == 'add-header' and args.version == '16':[m
+[32m+[m[32m    if args.feature == 'add-header' and args.version == '16':[m
+         benchmark_modification_16(args.headers, args.fields, 'add')[m
+     elif args.feature == 'rm-header' and args.version == '16':[m
+         benchmark_modification_16(args.headers, args.fields, 'rm')[m
+[31m-    elif args.feature == 'pipeline' and args.version == '16':[m
+[31m-        benchmark_pipeline_16(args.tables, args.table_size)[m
+[31m-    elif args.feature == 'read-state' and args.version == '16':[m
+[31m-        benchmark_memory_16(args.registers, args.element_width, args.nb_element,[m
+[31m-                            args.operations, False)[m
+[31m-    elif args.feature == 'write-state' and args.version == '16':[m
+[31m-        benchmark_memory_16(args.registers, args.element_width, args.nb_element,[m
+[31m-                            args.operations, True)[m
+ [m
+ if __name__=='__main__':[m
+     main()[m
+[1mdiff --git a/packet_modification/bm_modification.py b/packet_modification/bm_modification.py[m
+[1mindex 3dbff6f..01a0ea7 100644[m
+[1m--- a/packet_modification/bm_modification.py[m
+[1m+++ b/packet_modification/bm_modification.py[m
+[36m@@ -7,116 +7,6 @@[m [mfrom p4gen.genpcap import get_packetmod_pcap[m
+ from p4gen import copy_scripts[m
+ from p4gen.p4template import *[m
+ [m
+[31m-def generate_pisces_command(nb_headers, out_dir, mod_type):[m
+[31m-    rules = add_pisces_forwarding_rule()[m
+[31m-    actions = ''[m
+[31m-    match = 'ptp_reserved2=11'[m
+[31m-    for i in range(nb_headers-1):[m
+[31m-        actions += 'set_field:1->header_{0}_field_0,'.format(i)[m
+[31m-    if mod_type == 'rm':[m
+[31m-        actions += 'set_field:0->ptp_reserved2,deparse,output:NXM_NX_REG0[]'[m
+[31m-    else:[m
+[31m-        actions += 'set_field:1->ptp_reserved2,deparse,output:NXM_NX_REG0[]'[m
+[31m-    rules += add_openflow_rule(1, 32768, match, actions)[m
+[31m-[m
+[31m-    with open ('%s/pisces_rules.txt' % out_dir, 'w') as out:[m
+[31m-        out.write(rules)[m
+[31m-[m
+[31m-[m
+[31m-def benchmark_add_header_overhead(action_name, nb_header):[m
+[31m-    instruction_set =''[m
+[31m-    for i in range(nb_header):[m
+[31m-        instruction_set += '\tadd_header(header_%d);\n' % i[m
+[31m-    instruction_set += '\tmodify_field(ptp.reserved2, 1);'[m
+[31m-    return add_compound_action_14(action_name, '', instruction_set)[m
+[31m-[m
+[31m-def benchmark_remove_header_overhead(action_name, nb_header):[m
+[31m-    instruction_set =''[m
+[31m-    for i in range(nb_header):[m
+[31m-        instruction_set += '\tremove_header(header_%d);\n' % i[m
+[31m-    instruction_set += '\tmodify_field(ptp.reserved2, 0);'[m
+[31m-    return add_compound_action_14(action_name, '', instruction_set)[m
+[31m-[m
+[31m-def benchmark_modify_header_overhead(action_name, nb_header):[m
+[31m-    instruction_set =''[m
+[31m-    for i in range(nb_header):[m
+[31m-        instruction_set += '\tmodify_field(header_{0}.field_0, ' \[m
+[31m-                            'header_{0}.field_0 + 1);\n'.format(i)[m
+[31m-    return add_compound_action_14(action_name, '', instruction_set)[m
+[31m-[m
+[31m-def benchmark_add_header_overhead_16(action_name, nb_header):[m
+[31m-    instruction_set =''[m
+[31m-    for i in range(nb_header):[m
+[31m-        instruction_set += '\t\thdr.header_%d.setValid();\n' % i[m
+[31m-    instruction_set += '\t\thdr.ptp.reserved2 = 8w1;'[m
+[31m-    return add_compound_action(action_name, '', instruction_set)[m
+[31m-[m
+[31m-def benchmark_remove_header_overhead_16(action_name, nb_header):[m
+[31m-    instruction_set =''[m
+[31m-    for i in range(nb_header):[m
+[31m-        instruction_set += '\t\thdr.header_%d.setInvalid();\n' % i[m
+[31m-    instruction_set += '\t\thdr.ptp.reserved2 = 8w0;'[m
+[31m-    return add_compound_action(action_name, '', instruction_set)[m
+[31m-[m
+[31m-def benchmark_modify_header_overhead_16(action_name, nb_header):[m
+[31m-    instruction_set =''[m
+[31m-    for i in range(nb_header):[m
+[31m-        instruction_set += '\t\thdr.header_{0}.field_0 = hdr.header_{0}.field_0 + 1;\n'.format(i)[m
+[31m-    return add_compound_action(action_name, '', instruction_set)[m
+[31m-[m
+[31m-[m
+[31m-def benchmark_modification(nb_headers, nb_fields, mod_type):[m
+[31m-    """[m
+[31m-    This method generate the P4 program to benchmark packet modification[m
+[31m-[m
+[31m-    :param nb_headers: the number of generic headers included in the program[m
+[31m-    :type nb_headers: int[m
+[31m-    :param nb_fields: the number of fields (16 bits) in each header[m
+[31m-    :type tbl_size: int[m
+[31m-    :param nb_fields: modification type ['add', 'rm', 'mod'][m
+[31m-    :type tbl_size: str[m
+[31m-    :returns: bool -- True if there is no error[m
+[31m-[m
+[31m-    """[m
+[31m-    out_dir = 'output'[m
+[31m-    if not os.path.exists(out_dir):[m
+[31m-       os.makedirs(out_dir)[m
+[31m-[m
+[31m-    fwd_tbl = 'forward_table'[m
+[31m-[m
+[31m-    program  = add_headers_and_parsers(nb_headers, nb_fields)[m
+[31m-[m
+[31m-    if mod_type == 'add':[m
+[31m-        action_name = 'add_headers'[m
+[31m-        program += benchmark_add_header_overhead(action_name, nb_headers)[m
+[31m-    elif mod_type == 'rm':[m
+[31m-        action_name = 'remove_headers'[m
+[31m-        program += benchmark_remove_header_overhead(action_name, nb_headers)[m
+[31m-    elif mod_type == 'mod':[m
+[31m-        action_name = 'mod_headers'[m
+[31m-        program += benchmark_modify_header_overhead(action_name, nb_headers)[m
+[31m-[m
+[31m-    program += forward_table()[m
+[31m-[m
+[31m-    table_name = 'test_tbl'[m
+[31m-    program += add_table_no_match_14(table_name, '\t\t{0};'.format(action_name))[m
+[31m-[m
+[31m-[m
+[31m-    program += control(fwd_tbl, apply_table(table_name))[m
+[31m-[m
+[31m-    with open ('%s/main.p4' % out_dir, 'w') as out:[m
+[31m-        out.write(program)[m
+[31m-[m
+[31m-    commands = add_default_rule(table_name, action_name)[m
+[31m-    commands += cli_commands(fwd_tbl)[m
+[31m-    with open ('%s/commands.txt' % out_dir, 'w') as out:[m
+[31m-        out.write(commands)[m
+[31m-    copy_scripts(out_dir)[m
+[31m-    get_packetmod_pcap(nb_headers, nb_fields, mod_type, out_dir)[m
+[31m-    generate_pisces_command(nb_headers, out_dir, mod_type)[m
+[31m-[m
+[31m-    return True[m
+[31m-[m
+ def benchmark_modification_16(nb_headers, nb_fields, mod_type):[m
+     """[m
+     This method generate the P4 program to benchmark packet modification[m

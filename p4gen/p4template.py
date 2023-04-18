@@ -278,7 +278,7 @@ def add_control_block_16(block_name, actions, tables, applies, arguments):
 
 def add_main_module():
 
-    return '\nPipeline(ParserImpl(), verifyChecksum(), ingress(), egress(), computeChecksum(), DeparserImpl()) pipe; \nSwitch(pipe) main;\n'
+    return '\nPipeline(IngressParser(), Ingress(), IngressDeparser(), EgressParser(), Egress(), EgressDeparser() ) pipe; \nSwitch(pipe) main;\n'
 
 def cli_commands(fwd_tbl, ):
     """
@@ -663,6 +663,7 @@ def parser_start(next_parser='parse_ethernet'):
     This method returns the start of the parser
     """
     parser_str = 'parser start { return %s; }\n'  % next_parser
+
     return parser_str
 
 def parser_16(states_dec, parser_name):
@@ -670,4 +671,3 @@ def parser_16(states_dec, parser_name):
     binding = { 'ParserName' : parser_name, 'states_dec' : states_dec } 
 
     return read_template('template/parsers/parser_16.txt',binding)
-

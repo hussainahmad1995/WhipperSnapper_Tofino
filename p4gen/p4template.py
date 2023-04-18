@@ -278,7 +278,7 @@ def add_control_block_16(block_name, actions, tables, applies, arguments):
 
 def add_main_module():
 
-    return '\nPipeline(ParserImpl(), verifyChecksum(), ingress(), egress(), computeChecksum(), DeparserImpl()) main;\n'
+    return '\nPipeline(ParserImpl(), verifyChecksum(), ingress(), egress(), computeChecksum(), DeparserImpl()) pipe; \nSwitch(pipe) main;\n'
 
 def cli_commands(fwd_tbl, ):
     """

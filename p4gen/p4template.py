@@ -276,12 +276,6 @@ def add_control_block_16(block_name, actions, tables, applies, arguments):
 
     return read_template('template/controls/control_block_16.txt', binding)
 
-def add_control_block_IngressDeparser(block_name , applies , arguments):
-
-    binding = { 'block_name' : block_name , "applies" : applies , "arguments" : arguments}
-
-    return read_template("template/controls/control_Ingress_deparser_block.txt")
-
 def add_main_module():
 
     return '\nPipeline(ParserImpl(), verifyChecksum(), ingress(), egress(), computeChecksum(), DeparserImpl()) pipe; \nSwitch(pipe) main;\n'

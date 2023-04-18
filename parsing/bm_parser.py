@@ -400,7 +400,7 @@ def add_headers_and_parsers_16(nb_headers, nb_fields, do_checksum=False):
             next_states = select_case('default', 'accept')
         states_dec += add_state(state_name, header_name,'field_0', next_states)
 
-    program += parser_16(states_dec, 'ParserImpl')
+    program += parser_16(states_dec, 'IngressParser')
 
     return program
 

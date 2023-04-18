@@ -1,13 +1,8 @@
 parser $ParserName(
-    /*User*/
-
-    
-    packet_in packet,
-    out headers hdr, inout metadata meta,
+    packet_in        pkt,
+    out my_ingress_headers_t          hdr,
+    out my_ingress_metadata_t         meta,
     out ingress_intrinsic_metadata_t  ig_intr_md
-    
     ) {
-
 $states_dec
-
 }

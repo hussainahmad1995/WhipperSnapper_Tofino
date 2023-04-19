@@ -1,5 +1,5 @@
 parser $ParserName(
-    packet_in        pkt,
+    packet_in        packet,
     out my_ingress_headers_t          hdr,
     out my_ingress_metadata_t         meta,
     out ingress_intrinsic_metadata_t  ig_intr_md

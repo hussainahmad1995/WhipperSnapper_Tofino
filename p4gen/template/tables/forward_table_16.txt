@@ -1,5 +1,5 @@
     action forward(bit<9> port) {
-       ig_intr_md.egress_spec = port;
+        ig_tm_md.ucast_egress_port = port;
     }
     action _drop() {
         ig_dprsr_md.drop_ctl = 1;

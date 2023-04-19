@@ -1,0 +1,8 @@
+parser $ParserName(
+    packet_in        packet,
+    out my_egress_headers_t          hdr,
+    out my_egress_metadata_t         meta,
+    out egress_intrinsic_metadata_t  eg_intr_md)
+    {
+$states_dec
+    }

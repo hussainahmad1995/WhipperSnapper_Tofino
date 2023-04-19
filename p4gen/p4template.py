@@ -215,6 +215,12 @@ def add_state_type_3(state_name , next_state, header_name):
 
     return read_template('template/parsers/state_type_3_16.txt', binding)
 
+def add_state_type_egress_parser(state_name, next_state,  header_name):
+
+    binding = {'state_name' : state_name , 'next_state' : next_state, 'header_name' : header_name}
+
+    return read_template('template/parsers/egress_parser_state.txt', binding)
+
 def add_table(tbl_name, matches, actions, tbl_size, version):
     """
     This method returns the table definition with generic match-actions
@@ -666,8 +672,12 @@ def parser_start(next_parser='parse_ethernet'):
 
     return parser_str
 
-def parser_16(states_dec, parser_name):
+def Ingress_parser_16(states_dec, parser_name):
 
     binding = { 'ParserName' : parser_name, 'states_dec' : states_dec } 
+    return read_template('template/parsers/Ingress_parser_16.txt' , binding)
 
-    return read_template('template/parsers/parser_16.txt',binding)
+def Egress_parser_16(parser_name , states_dec):
+
+    binding = {'ParserName' : parser_name, 'states_dec' : states_dec }
+    return read_template('template/parsers/Egress_parser_16.txt' , binding)

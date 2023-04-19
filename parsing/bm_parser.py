@@ -5,24 +5,6 @@ from p4gen.genpcap import get_parser_header_pcap, get_parser_field_pcap
 from p4gen.p4template import *
 from p4gen import copy_scripts
 
-def generate_pisces_command(out_dir, nb_headers, nb_fields, checksum=False):
-    rules = add_pisces_forwarding_rule()
-    matches = 'ethernet_dstAddr=0x0708090A0B0C'
-    for i in range(nb_headers-1):
-        matches += ',header_{0}_field_0=1'.format(i)
-    actions = 'set_field:2->reg0,resubmit(,1)'
-    rules += add_openflow_rule(0, 32768, matches, actions)
-
-    actions = ''
-    if checksum:
-        ip_checksum = 'calc_fields_update(ipv4_hdrChecksum,csum16,fields:ipv4_version_ihl,ipv4_diffserv,ipv4_totalLen,ipv4_identification,ipv4_flags_fragOffset,ipv4_ttl,ipv4_protocol,ipv4_srcAddr,ipv4_dstAddr),'
-        actions += ip_checksum
-    actions += 'deparse,output:NXM_NX_REG0[]'
-    rules += add_openflow_rule(1, 32768, '', actions)
-
-    with open ('%s/pisces_rules.txt' % out_dir, 'w') as out:
-        out.write(rules)
-
 class ParseNode():
     def __init__(self, parent=None, node_name='', code = '', code_header='', code_parser='', header_dec='', headers = ''):
         self.parent = parent
@@ -270,7 +252,7 @@ def parser_complexity_16(depth, fanout):
 
     states_dec += preorder_parser(root)
 
-    program += parser_16(states_dec, 'ParserImpl')
+    program += parser_16(states_dec, 'IngressParser')
 
     program += add_ingress_block_16()
 
@@ -400,8 +382,18 @@ def add_headers_and_parsers_16(nb_headers, nb_fields, do_checksum=False):
             next_states = select_case('default', 'accept')
         states_dec += add_state(state_name, header_name,'field_0', next_states)
 
-    program += parser_16(states_dec, 'IngressParser')
+    program += Ingress_parser_16(states_dec, 'IngressParser')
+    return program
 
+def add_egress_parser():
+    """This method adds the Egress Parser which is a mandatory state in the 
+        Tofino Architecture, the parser state start and only extracts the header and emits
+        the header onto the egress processing
+
+    """
+    states_dec = ''
+    states_dec += add_state_type_egress_parser("start" , "accept" , "eg_intr_md"  )
+    program = Egress_parser_16("EgressParser" , states_dec )
     return program
 
 

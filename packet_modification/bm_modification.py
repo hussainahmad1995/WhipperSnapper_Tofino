@@ -3,6 +3,7 @@ from subprocess import call
 from pkg_resources import resource_filename
 from parsing.bm_parser import add_headers_and_parsers
 from parsing.bm_parser import add_headers_and_parsers_16
+from parsing.bm_parser import add_egress_parser
 from p4gen.genpcap import get_packetmod_pcap
 from p4gen import copy_scripts
 from p4gen.p4template import *
@@ -47,7 +48,7 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
 
     fwd_tbl = 'forward_table'
 
-    #Ingress() parser
+    #Ingress() parser block
     program  = add_headers_and_parsers_16(nb_headers, nb_fields)
     actions = ''
 
@@ -81,16 +82,24 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
     #IngressDeparser() control block arguments and apply statements
 
     Ingress_deparser_arguments = """
-        packet_out pkt,
+        packet_out packet,
         inout my_ingress_headers_t                       hdr,
         in    my_ingress_metadata_t                      meta,
         in    ingress_intrinsic_metadata_for_deparser_t  ig_dprsr_md"""
 
-    Ingress_deparser_applies = "\t\tpkt.emit(hdr);"
+    Ingress_deparser_applies = "\tpacket.emit(hdr);"
     program += add_control_block_16("IngressDeparser" ,'','',Ingress_deparser_applies, Ingress_deparser_arguments)
 
 
     #EgressParser()
+
+    Egress_parser_argument = """
+    packet_in        packet,
+    out my_egress_headers_t          hdr,
+    out my_egress_metadata_t         meta,
+    out egress_intrinsic_metadata_t  eg_intr_md
+    """
+    program += add_egress_parser()
 
     #Egress() control block arguments 
     egress_arguments = """    
@@ -103,25 +112,17 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
     """
     program += add_control_block_16('Egress', '', '', '', egress_arguments)
 
-
     #EgressDeparser() block arguments and apply statements
 
     egress_deparser_arguments = """
-    packet_out pkt,
-    /* User */
+    packet_out packet,
     inout my_egress_headers_t                       hdr,
     in    my_egress_metadata_t                      meta,
-    /* Intrinsic */
     in    egress_intrinsic_metadata_for_deparser_t  eg_dprsr_md
     """
 
-    egress_deparser_applies = '\t\tpacket.emit(hdr.ethernet);\n'
-    egress_deparser_applies += '\t\tpacket.emit(hdr.ptp);\n'
-
-    for i in range(nb_headers):
-        egress_deparser_applies += '\t\tpacket.emit(hdr.header_%d);\n' % i
-
-    program += add_control_block_16('MyEgressDeparser', '', '', egress_deparser_applies, egress_deparser_arguments)
+    egress_deparser_applies = '\t\tpacket.emit(hdr);\n'
+    program += add_control_block_16('EgressDeparser', '', '', egress_deparser_applies, egress_deparser_arguments)
 
     #Tofino does not support checksum
     # program += add_control_block_16('verifyChecksum', '', '', '', 'inout headers hdr, inout metadata meta')

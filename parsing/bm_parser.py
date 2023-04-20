@@ -162,47 +162,6 @@ def write_output(output_dir, program):
         out.write(program)
     copy_scripts(output_dir)
 
-def parser_complexity(depth, fanout):
-    """
-    This method adds Ethernet, IPv4, TCP, UDP, and a number of generic headers
-    which follow the UDP header. The UDP destination port 0x9091 is used to
-    identify the generic header
-
-    :param depth: the depth of the parsing graph
-    :type depth: int
-    :param fanout: the number branches for each node
-    :type fanout: int
-    :returns: str -- the header and parser definition
-
-    """
-    program = p4_define(14) + ethernet_header(14) + ptp_header(14) + parser_start()
-
-    next_headers = select_case('ETHERTYPE_PTP', 'parse_ptp')
-    next_headers += select_case('default', 'ingress')
-    program += add_parser('ethernet_t', 'ethernet', 'parse_ethernet',
-                            'etherType', next_headers)
-
-    ptp_next_states = ''
-    for i in range(fanout):
-        ptp_next_states += select_case(i+1, 'parse_header_%d' % i)
-    ptp_next_states += select_case('default', 'ingress')
-    program += add_parser('ptp_t', 'ptp', 'parse_ptp',
-                            'reserved2', ptp_next_states)
-
-    root = ParseNode()
-    loop_rec(root, depth, fanout)
-    program += preorder(root)
-
-    output_dir = 'output'
-    if not os.path.exists(output_dir):
-       os.makedirs(output_dir)
-    program = add_forwarding_table(output_dir, program)
-    write_output(output_dir, program)
-    get_parser_header_pcap(depth+1, 1, output_dir)
-
-    return True
-
-
 def parser_complexity_16(depth, fanout):
     """
     This method adds Ethernet, IPv4, TCP, UDP, and a number of generic headers

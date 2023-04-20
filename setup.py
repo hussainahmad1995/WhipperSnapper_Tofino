@@ -10,12 +10,12 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name = "P4Benchmark",
+    name = "TofinoBenchmark",
     version = VERSION,
     author = "Huynh Tu Dang",
     author_email = "huynh.tu.dang@usi.ch",
     description = ("A tool for generating P4 programs which test various "
-                                   "aspect of P4 compilers and targets."),
+                                   "aspect of Tofino compilers and sw."),
     license = "GPL-3.0",
     keywords = "P4 benchmark",
     url = "https://github.com/usi-systems/p4benchmark",

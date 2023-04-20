@@ -1,7 +1,7 @@
 P4Benchmark
 =============
 
-Tool to benchmark P4 Compilers and Targets
+Tool to benchmark Tofino Compiler and Switch
 
 Installation
 ------------
@@ -14,66 +14,18 @@ Run the following commands::
 Generate P4 Program and PCAP file for testing
 ---------------------------------------------
 
-``'--version' option can be used to set the P4 Program language to 14/16``
-
-
-* **Benchmark parse field**
-
-The generated P4 program parses Ethernet,
-PTP and a customized header containing 4 fields and each field is 16-bit wide::
-
-    p4benchmark --feature parse-field --fields 4 --version 16
-
-* **Benchmark parse header**
-
-The generated P4 program parses Ethernet, PTP and
-a customized number of headers each containing a customized number of fields.
-Each field is 16-bit wide::
-
-    p4benchmark --feature parse-header --fields 4 --headers 4 --version 16
-
-* **Benchmark parse complex**
-
-The generated P4 program parses Ethernet, PTP and
-a parse graph that has the depth of 2 and each node has 2 branches::
-
-    p4benchmark --feature parse-complex --depth 2 --fanout 2 --version 16
-
-* **Benchmark action complexity**
-
-The generated P4 program has N=2 number of set-field operations::
-
-    p4benchmark --feature set-field --operations 2 --version 16
-
 * **Benchmark header addition**
 
 The generated P4 program adds N=2 number of headers to packets::
 
-    p4benchmark --feature add-header --headers 2 --version 16
+    p4benchmark --feature add-header --headers 2 
 
 * **Benchmark header removal**
 
 The generated P4 program removes N=2 number of headers to packets::
 
-    p4benchmark --feature rm-header --headers 2 --version 16
+    p4benchmark --feature rm-header --headers 2
 
-* **Benchmark processing pipeline**
-
-The generated P4 program applies N=2 number of tables::
-
-    p4benchmark --feature pipeline --tables 2 --table-size 32 --version 16
-
-* **Benchmark Read State**
-
-The generated P4 program declares 1 register and performs 10 number of read operations::
-
-    p4benchmark --feature read-state --registers 1 --operations 10 --version 16
-
-* **Benchmark Write State**
-
-The generated P4 program declares 1 register and performs 10 number of write operations::
-
-    p4benchmark --feature write-state --registers 1 --operations 10 --version 16
 
 Generated Files
 ---------------
@@ -92,7 +44,7 @@ The `output` directory contains::
 
 Run Behavioral Target
 ---------------------
-Require Behavioral Model 2 and P4C
+Require Tofino Switch or Model with Tofino Compiler
 
     $ cd output
     $ ./run_switch
@@ -185,9 +137,4 @@ The above script is to automate the testing of a feature completely. The actual 
 9. Average of difference of these timestamps is taken for all the packets, which represents the latency.
 10. An algorithm is used to eliminate buggy values due to glitches in packet transfer, droppings. This is based on the fact that latency values are expected to be similar for each packet. The latency values are divided into various category. The category having the highest frequency will be the one to be selected and average of all values of only that category will be calculated. Note that if two categories are having major frequency count which is a rare case, we don't get much error by considering only one of them.
 
-## Contributors
 
-[Madhav Tummala](https://github.com/MadhavChoudhary)<br />
-[Siddhant Bajaj](https://github.com/siddhantbajaj1)<br />
-[Abhinav Jindal](https://github.com/AbhinavJindl)<br />
-[Pavan Kumar Vaddineni](https://github.com/VaddineniPavankumar)<br />

@@ -1,4 +1,4 @@
-P4Benchmark
+TofinoBenchmark
 =============
 
 Tool to benchmark Tofino Compiler and Switch

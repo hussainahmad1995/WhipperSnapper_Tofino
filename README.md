@@ -42,9 +42,14 @@ The `output` directory contains::
     5. run_test.py    		Python packet generator and receiver
 
 
-Run Behavioral Target
+Run Tofino Switch
 ---------------------
-Require Tofino Switch with Tofino Compiler
+Requires Tofino Switch with Tofino Compiler
+
+Set the SDE path first 
+    $ . ~/tools/set_sde.bash
+
+Run Tofino Switch
 
     $ cd output
     $ ./run_tofino_switch.sh

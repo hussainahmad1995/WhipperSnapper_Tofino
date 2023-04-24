@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 # BMV2_PATH=../../behavioral-model
 # P4C_BM_PATH=../../p4c
 # PKTGEN_PATH=../pktgen/build/p4benchmark
@@ -7,7 +7,11 @@
 # SWITCH_PATH=$BMV2_PATH/targets/simple_switch/simple_switch
 # CLI_PATH=$BMV2_PATH/tools/runtime_CLI.py
 
-TOFINO_PATH=home/tna-model/bf-sde-9-9-0
+# Make sure to the set the SDE the bash
+ . ~/tools/set_sde.bash
+
+
+TOFINO_PATH=$HOME/bf-sde-9-9-0
 TOFINO_COMPILER_PATH=$SDE
 TOFINO_SCRIPT=$HOME/tools/p4_build.sh
 TOFINO_CLI_PATH=$SDE/run_tofino_model.sh

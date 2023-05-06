@@ -143,7 +143,7 @@ def add_forwarding_table(output_dir, program):
     program += forward_table()
     program += control(fwd_tbl, '')
     commands = cli_commands(fwd_tbl)
-    with open ('%s/commands.txt' % output_dir, 'w') as out:
+    with open ('%s/commands_for_tofino.txt' % output_dir, 'w') as out:
         out.write(commands)
     return program
 
@@ -201,13 +201,13 @@ def parser_complexity_16(depth, fanout):
     states_dec = ''
     states_dec += add_state_without_select('start','parse_ethernet')
 
-    next_states = select_case('16w0x88f7', 'parse_ptp')
+    next_states = select_case('0x02', 'parse_ptp')
     next_states += select_case('default', 'accept')
     states_dec += add_state('parse_ethernet', 'ethernet', 'etherType', next_states)
 
     next_states = select_case('8w1', 'parse_header_0')
     next_states += select_case('default', 'accept')
-    states_dec += add_state('parse_ptp', 'ptp', 'reserved2', next_states)
+    states_dec += add_state('parse_ptp', 'ptp', 'version', next_states)
 
     states_dec += preorder_parser(root)
 
@@ -264,7 +264,7 @@ def add_headers_and_parsers(nb_headers, nb_fields, do_checksum=False):
         ptp_next_states += select_case(0x1, 'parse_header_0')
     ptp_next_states += select_case('default', 'ingress')
     program += add_parser('ptp_t', 'ptp', 'parse_ptp',
-                            'reserved2', ptp_next_states)
+                            'version', ptp_next_states)
 
     field_dec = ''
     for i in range(nb_fields):
@@ -297,7 +297,7 @@ def add_headers_and_parsers_16(nb_headers, nb_fields, do_checksum=False):
     :returns: str -- the header and parser definition
 
     """
-    program = p4_define(16) + ethernet_header(16) + ptp_header(16)
+    program = p4_define(16) + ethernet_header(16) + timestamp_header(16)
 
     field_dec = ''
     for i in range(nb_fields):
@@ -311,31 +311,31 @@ def add_headers_and_parsers_16(nb_headers, nb_fields, do_checksum=False):
 
     header_dec = ''
     header_dec += add_struct_item('ethernet_t', 'ethernet')
-    header_dec += add_struct_item('ptp_t', 'ptp')
+    header_dec += add_struct_item('timestamp_t', 'timestamp')
 
     for i in range(nb_headers):
         item_type_name = 'header_%d_t' % i
         item_name = 'header_%d' % i
         header_dec += add_struct_item(item_type_name, item_name)
 
-    program += add_headers(header_dec)
+    program += add_ingress_headers(header_dec)
 
     states_dec = ''
     states_dec += add_state_without_select('start','parse_ethernet')
 
-    next_states = select_case('16w0x88f7', 'parse_ptp')
+    next_states = select_case('0x777', 'parse_timestamp')
     next_states += select_case('default', 'accept')
     states_dec += add_state('parse_ethernet', 'ethernet', 'etherType', next_states)
 
-    next_states = select_case('8w1', 'parse_header_0')
+    next_states = select_case('0x778', 'parse_header_0')
     next_states += select_case('default', 'accept')
-    states_dec += add_state('parse_ptp', 'ptp', 'reserved2', next_states)
+    states_dec += add_state('parse_timestamp', 'timestamp', 'version', next_states)
 
     for i in range(nb_headers):
         header_name = 'header_%d' % i
         state_name = 'parse_header_%d' % i
         if (i < (nb_headers - 1)):
-            next_states  = select_case('16w0', 'accept')
+            next_states  = select_case("0x100%d" % i , 'accept')
             next_states += select_case('default', 'parse_header_%d' % (i + 1))
         else:
             next_states = select_case('default', 'accept')
@@ -344,15 +344,36 @@ def add_headers_and_parsers_16(nb_headers, nb_fields, do_checksum=False):
     program += Ingress_parser_16(states_dec, 'IngressParser')
     return program
 
-def add_egress_parser():
+def add_egress_parser(nb_headers):
     """This method adds the Egress Parser which is a mandatory state in the 
         Tofino Architecture, the parser state start and only extracts the header and emits
         the header onto the egress processing
 
     """
+    program = ""
+    header_dec = ''
+    header_dec += add_struct_item('ethernet_t', 'ethernet')
+    header_dec += add_struct_item('timestamp_t', 'timestamp')
+
+    for i in range(nb_headers):
+        item_type_name = 'header_%d_t' % i
+        item_name = 'header_%d' % i
+        header_dec += add_struct_item(item_type_name, item_name)
+
+    program += add_egress_headers(header_dec)
+
     states_dec = ''
-    states_dec += add_state_type_egress_parser("start" , "accept" , "eg_intr_md"  )
-    program = Egress_parser_16("EgressParser" , states_dec )
+    states_dec += add_state_type_egress_parser("start" , "parse_ethernet" , "eg_intr_md")
+
+    next_states = select_case('0x777', 'parse_timestamp')
+    next_states += select_case('default', 'accept')
+    states_dec += add_state('parse_ethernet', 'ethernet', 'etherType', next_states)
+
+    states_dec += add_state_type_egress_parser("parse_timestamp" , "accept" , "hdr.timestamp")
+
+    program += Egress_parser_16("EgressParser", states_dec )
+
+    # states_dec += add_state_without_select("")
     return program
 
 

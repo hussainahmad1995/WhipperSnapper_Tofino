@@ -1,5 +1,7 @@
     action forward(bit<9> port) {
         ig_tm_md.ucast_egress_port = port;
+        hdr.timestamp.time_value[31:0] = ig_prsr_md.global_tstamp[31:0];   
+
     }
     action _drop() {
         ig_dprsr_md.drop_ctl = 1;

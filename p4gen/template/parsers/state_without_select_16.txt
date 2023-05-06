@@ -1,3 +1,7 @@
+    /* This is a mandatory state, required by Tofino Architecture */
+
     state $state_name {
+        packet.extract(ig_intr_md);
+        packet.advance(PORT_METADATA_SIZE);
         transition $next_state;
     }

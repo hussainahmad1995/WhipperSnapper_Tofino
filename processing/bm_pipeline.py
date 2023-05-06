@@ -5,32 +5,6 @@ from p4gen.genpcap import get_pipeline_pcap
 from p4gen import copy_scripts
 from p4gen.p4template import *
 
-def generate_pisces_command(nb_tables, table_size, out_dir):
-    rules = add_pisces_forwarding_rule()
-    match = 'ethernet_dstAddr=0x0708090A0B0C'
-    action = 'set_field:2->reg0,resubmit(,1)'
-    rules += add_openflow_rule(0, 32768, match, action)
-
-    actions = ''
-    for i in range(nb_tables-1):
-        match = 'ethernet_dstAddr=0x0CC47AA32535'
-        actions = 'set_field:2->reg0,resubmit(,{0})'.format(i+2)
-        rules += add_openflow_rule(i+1, 32768, match, actions)
-        match = 'ethernet_dstAddr=0x0708090A0B0C'
-        actions = 'set_field:2->reg0,resubmit(,{0})'.format(i+2)
-        rules += add_openflow_rule(i+1, 32768, match, actions)
-        for j in range(table_size-2):
-            mac_addr = "0x0{0}C47{1}A353{2}".format(j%10, j%7, j%5)
-            match = 'ethernet_dstAddr=%s' % mac_addr
-            actions = 'set_field:2->reg0,resubmit(,{0})'.format(i+2)
-            rules += add_openflow_rule(i+1, 32768, match, actions)
-
-    actions = 'deparse,output:NXM_NX_REG0[]'
-    rules += add_openflow_rule(nb_tables, 32768, '', actions)
-
-    with open ('%s/pisces_rules.txt' % out_dir, 'w') as out:
-        out.write(rules)
-
 
 def benchmark_pipeline(nb_tables, table_size):
     """
@@ -76,7 +50,7 @@ def benchmark_pipeline(nb_tables, table_size):
 
     program += control(fwd_tbl, applies)
 
-    with open ('%s/main.p4' % out_dir, 'w') as out:
+    with open ('%s/big.p4' % out_dir, 'w') as out:
         out.write(program)
 
     commands += cli_commands(fwd_tbl)
@@ -195,15 +169,15 @@ def benchmark_pipeline_16(nb_tables, table_size):
 
     program += add_main_module()
 
-    with open ('%s/main.p4' % out_dir, 'w') as out:
-        out.write(program)
+    # with open ('%s/main.p4' % out_dir, 'w') as out:
+    #     out.write(program)
 
-    commands += cli_commands(fwd_tbl)
-    with open ('%s/commands.txt' % out_dir, 'w') as out:
-        out.write(commands)
-    copy_scripts(out_dir)
+    # commands += cli_commands(fwd_tbl)
+    # with open ('%s/commands.txt' % out_dir, 'w') as out:
+    #     out.write(commands)
+    # copy_scripts(out_dir)
 
-    get_pipeline_pcap(out_dir)
+    # get_pipeline_pcap(out_dir)
     generate_pisces_command(nb_tables, table_size, out_dir)
     return True
 

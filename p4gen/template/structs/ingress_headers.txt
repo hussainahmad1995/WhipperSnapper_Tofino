@@ -1,0 +1,6 @@
+struct my_ingress_headers_t{
+$header_dec
+}
+struct my_ingress_metadata_t{
+
+}

@@ -11,8 +11,8 @@ Run the following commands::
     pip install -r requirements.txt
     sudo python setup.py install
 
-Generate P4 Program and PCAP file for testing
----------------------------------------------
+Generate P4 Program 
+-------------------
 
 * **Benchmark header addition**
 
@@ -33,101 +33,54 @@ Generated Files
 The `output` directory contains::
 
     $ ls output
-    commands.txt  main.p4  run_switch.sh  run_test.py  test.pcap
+    main.p4 
 
-    1. main.p4        		The desired program to benchmark a particular feature of the P4 target
-    2. test.pcap      		Sample packet crafted to match the parser or tables
-    3. run_tofino_switch.sh  	Script to run and configure tofino switch
-    4. commands.txt   		Match-action rules for tables
-    5. run_test.py    		Python packet generator and receiver
+    1. main.p4   The desired program to benchmark a particular feature of the P4 target
 
 
 Run Tofino Switch
 ---------------------
-Requires Tofino Switch with Tofino Compiler
+Requires Tofino Switch or Model along with Tofino SDE(we are using bf-sde-9.9.0)
 
 Set the SDE path first 
-    $ . ~/tools/set_sde.bash
+    $ $SDE_INSTALL/tools/set_sde.bash
 
-Run Tofino Switch
+Run Tofino Switch HD (in a seperate window) :
 
-    $ cd output
-    $ ./run_tofino_switch.sh
+    $ ./run_switchd.sh -p main 
 
-Run Python packet generator
----------------------------
+To work with the Wedge-100BF make sure to enable kernel modules:
+    load the bfrt_kpt module - for the ASIC 
 
-In another terminal, run::
+- there are two options
+    - either use the  CPU <——> PCIE port
+        - port 192
+    - either use the  CPU <———> ETHERNET port
+        - port 64 - 67
 
-    $ cd output
-    $ sudo ./run_test.py --nb-headers 1 --nb-fields 4
+    NOTE - make sure the libpltfm_mgr.so is loaded - if working with Wedge 100-BF switch as the default is MODEL 
 
-PKTGEN (Send PCAP file)
------------------------
+In our experiments we are using CPU ETH interface to send packet:
+    10 Gbps Intel X552 MAC x2 
 
-Or, you could use a high performance packet generator that sends the prepared
-PCAP file and sniffs for returning packets
 
-**Build**
+Make sure to add, set and enable Tofino ports using the provided cli (check Tofino 1 CPU-Ethernet port mapping):
 
-Requrire `cmake` and `libpcap`::
+    bf-sde.pm> port-add 33/- 10G NONE
+    bf-sde.pm> an-set 33/- 2
+    bf-sde.pm> port-enb 33/-
 
-    cd pktgen
-    mkdir build
-    cd build
-    cmake ..
-    make
+Add entries to the forward table : 
 
-**Run pktgen**
+    $ $SDE_INSTALL/run_bfshell.sh -b ~/WhipperSnapper_Tofino/tofino/headers_test/bfrt_python/fill_table_forward.py
 
-This packet generator reads the prepared PCAP file and send `c` copies of that
-packet at `t` Byte per second out of the interface `veth4`. The result is stored
-in the `result` directory::
+Ma
 
-    $ p4benchmark/pktgen/build
-    $ sudo ./p4benchmark -p ../../output/test.pcap -i veth4 -c 10000 -t 10000 -o result
 
 TO MEASURE LATENCIES
 --------------------
 
-On compiling the p4 program, with the suitable compiler backend, a configuration file is produced. This configuration can be dumped onto the respective hardware component, say FPGA/PISCES. 
-The output produced by Whippersnapper 2.0 is capable of running the p4 program on p4 software switch aka bmv2 or behaviour model version 2.
-The test.pcap file has the structure of the packet to be sent.
-To measure the latency produced by simple_switch (the time for packet to be processed and pass out of the switch) can be measured in two ways:
 
-## Using pktgen: Build pktgen, by the above procedure
-
-**Setup**
-```
-	sudo ./veth_setup.sh -- once per session
-	g++ DataAlgo.cpp -o DataAlgo
-	g++ Percent.cpp -o Percent
-	Change lines 23, 63, 65 in measure_latency.sh according to the feature being tested.
-```
-
-**Run Test**
-```	
-    sudo ./measure_latency.sh -- give desired no of packets, transmission rate and version, ex: 10000, 10000, 16
-```
-
-The latency values will be stored to <feature>-<version>-<packets>-<rate>.txt and the normalised percentage alues will be stored to <feature>-<version>-<packets>-<rate>-Percent.txt
-
-DataAlgo filters the outliers in the dataset to some extent. It first calculates the mean of entire data, then clusters data surrounding the mean within an offset of standard deviation and then recalculates the mean of this clustered data. 
-
-## Using tshark (3rd party)
-
-**Setup**
-```
-	sudo apt install tshark
-	cd /usr/share/wireshark/
-	nano init.lua  -- In line 29 set disable_lua = true
-	change line 30 of latency_new.sh according to the feature being tested.
-```
-**Run Test**
-```
-	sudo ./latency_new.sh -- give desired no of packets and version, ex: 10000, 16
-```
-The results will be saved in latency.csv<br />
 
 ## Working
 The above script is to automate the testing of a feature completely. The actual process going on is

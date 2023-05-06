@@ -18,13 +18,13 @@ Generate P4 Program and PCAP file for testing
 
 The generated P4 program adds N=2 number of headers to packets::
 
-    p4benchmark --feature add-header --headers 2 
+    sudo p4benchmark --feature add-header --headers 2 
 
 * **Benchmark header removal**
 
 The generated P4 program removes N=2 number of headers to packets::
 
-    p4benchmark --feature rm-header --headers 2
+    sudo p4benchmark --feature rm-header --headers 2
 
 
 Generated Files
@@ -35,19 +35,24 @@ The `output` directory contains::
     $ ls output
     commands.txt  main.p4  run_switch.sh  run_test.py  test.pcap
 
-    1. main.p4        The desired program to benchmark a particular feature of the P4 target
-    2. test.pcap      Sample packet crafted to match the parser or tables
-    3. run_switch.sh  Script to run and configure bmv2
-    4. commands.txt   Match-action rules for tables
-    5. run_test.py    Python packet generator and receiver
+    1. main.p4        		The desired program to benchmark a particular feature of the P4 target
+    2. test.pcap      		Sample packet crafted to match the parser or tables
+    3. run_tofino_switch.sh  	Script to run and configure tofino switch
+    4. commands.txt   		Match-action rules for tables
+    5. run_test.py    		Python packet generator and receiver
 
 
-Run Behavioral Target
+Run Tofino Switch
 ---------------------
-Require Tofino Switch or Model with Tofino Compiler
+Requires Tofino Switch with Tofino Compiler
+
+Set the SDE path first 
+    $ . ~/tools/set_sde.bash
+
+Run Tofino Switch
 
     $ cd output
-    $ ./run_switch
+    $ ./run_tofino_switch.sh
 
 Run Python packet generator
 ---------------------------

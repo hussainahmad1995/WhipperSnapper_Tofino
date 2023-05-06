@@ -1,18 +1,21 @@
 #!/bin/bash
-
 #Before running the script make sure the $SDE is set 
-TOFINO_PATH=$SDE
-TOFINO_SCRIPT=$SDE/tools/p4_build.sh
-TOFINO_RUN_CLI_PATH=$SDE/tools/run_bfshell.sh
-TOFINO_RUN_SWITCH=$SDE/run_switchhd.sh
-PKTGEN_PATH=../pktgen/build/p4benchmark
-VETH_SCRIPT=$SDE/tools/veth_setup.sh
+#path to compiling P4 program for Tofino Switch 
 
+if [ -z "$SDE" ]; then
+    echo "Error: SDE environment variable is not set."
+    exit 1
+fi
+
+TOFINO_COMP_SCRIPT=$SDE/tools/p4_build.sh
+TOFINO_RUN_CLI_PATH=$SDE/run_bfshell.sh
+TOFINO_RUN_SWITCH=$SDE/run_switchd.sh
+PKTGEN_PATH=../pktgen/build/p4benchmark
 PROG="main"
 
 set -m
 #compile the P4 program
-# $TOFINO_SCRIPT $PROG.p4
+# $TOFINO_COMP_SCRIPT $PROG.p4
 
 if [ $? -ne 0 ]; then
 echo "p4 compilation failed"
@@ -21,15 +24,10 @@ fi
 
 sudo echo "sudo" > /dev/null
 #set up virtual ethernet ports
-sudo .$VETH_SCRIPT 
+sudo $SDE/tools/veth_setup.sh
 
-#
-sudo $TOFINO_SWITCH_RUN -p $PROG >/dev/null 2>&1
+echo "The problem is here and the $SDE"
+#start tofino swithch driver
+$TOFINO_RUN_SWITCH -p $PROG 
 
-sleep 2
-echo "**************************************"
-echo "Sending commands to switch through CLI"
-echo "**************************************"
-./$TOFINO_CLI_PATH $PROG < commands.txt
-echo "READY!!!"
-fg
+

@@ -95,7 +95,7 @@ def add_ingress_block_16(nb_operations):
     actions += write_to_custom_header_16(action_name, nb_operations)
     tables = forward_table_16()
     table_name = 'test_tbl'
-    match = '\t\t\thdr.ptp.reserved2 : exact;'
+    match = '\t\t\thdr.ptp.version : exact;'
     action = '\t\t\t_nop;\n\t\t\t{0};'.format(action_name)
     tables += add_table(table_name, match, action, 4, 16)
     applies = '\t\tforward_table.apply();\n\t\t%s.apply();' % table_name
@@ -126,7 +126,7 @@ def benchmark_field_write(nb_operations, do_checksum=False):
     program += write_to_custom_header(action_name, nb_operations)
 
     table_name = 'test_tbl'
-    match = 'ptp.reserved2 : exact;'
+    match = 'ptp.version : exact;'
     actions = '\t\t_nop;\n\t\t{0};'.format(action_name)
     program += add_table(table_name, match, actions, 4, 14)
 

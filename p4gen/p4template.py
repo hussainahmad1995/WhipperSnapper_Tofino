@@ -25,10 +25,8 @@ def p4_define(version):
     :raises: None
 
     """
-    if version == 14:
-        p4_define = read_template('template/define.txt')
-    else: 
-        p4_define = read_template('template/headers/define_16.txt')
+   
+    p4_define = read_template('template/headers/define_16.txt')
     return p4_define
 
 def ethernet_header(version):
@@ -39,10 +37,7 @@ def ethernet_header(version):
     :raises: None
 
     """
-    if version == 14:
-        return read_template('template/headers/ethernet.txt')
-    else:
-        return read_template('template/headers/ethernet_16.txt')
+    return read_template('template/headers/ethernet_16.txt')
 
 def ethernet():
     """
@@ -108,10 +103,6 @@ def nop_action():
     """
     return read_template('template/actions/nop.txt')
 
-def nop_action_14():
-
-    return read_template('template/actions/nop_14.txt')
-
 def forward_table():
     """
     This method returns the 'forwarding_table' definition
@@ -126,10 +117,8 @@ def forward_table():
 def forward_table_16():
     """
     This method returns the 'forwarding_table' definition
-
     :returns:  str -- the code in plain text
     :raises: None
-
     """
     d = { 'table_name': 'forward_table' }
     return read_template('template/tables/forward_table_16.txt', d)
@@ -374,11 +363,13 @@ def add_metadata():
 
     return read_template('template/structs/metadata.txt')
 
-def add_headers(header_dec):
-
+def add_ingress_headers(header_dec):
     binding = {'header_dec' : header_dec}
+    return read_template('template/structs/ingress_headers.txt', binding)
 
-    return read_template('template/structs/headers.txt', binding)
+def add_egress_headers(header_dec):
+    binding = {'header_dec' : header_dec}
+    return read_template('template/structs/egress_headers.txt', binding)
 
 def add_struct_item(item_type_name, item_name):
 
@@ -476,24 +467,6 @@ def add_compound_action(action_name, params, instruction_set):
     binding = {'action_name' : action_name, 'params': params,
                 'instruction_set': instruction_set}
     return read_template('template/actions/compound_action.txt', binding)
-
-def add_compound_action_14(action_name, params, instruction_set):
-    """
-    This method returns a compound action
-
-    :param action_name: the name of the compound action
-    :type action_name: str
-    :param params: the parameters for the action
-    :type params: str
-    :param instruction_set: the instruction set of this compound action
-    :type instruction_set: str
-    :returns:  str -- the code in plain text
-    :raises: None
-
-    """
-    binding = {'action_name' : action_name, 'params': params,
-                'instruction_set': instruction_set}
-    return read_template('template/actions/compound_action_14.txt', binding)
 
 def add_register(register_name, element_width, nb_element ,version):
     """
@@ -623,46 +596,11 @@ def udp(other_states=''):
     """
     return (add_udp_header(14) + add_udp_parser(other_states))
 
-def add_pisces_forwarding_rule():
+def timestamp_header(version):
     """
-    This method returns the forwarding rules for PISCES
-
-    :returns:  str -- the code in plain text
-    :raises: None
-
+    This method returns the timestamp header definition
     """
-    return read_template('template/commands/pisces_forward.txt')
-
-def add_openflow_rule(tbl_id, priority, match, actions):
-    """
-    This method returns the command for installing a rule to a table
-
-    :param tbl_id: the id of the table
-    :type tbl_id: int
-    :param priority: the priority of the rule
-    :type priority: int
-    :param actions: the actions that will be invoked if matched
-    :type actions: str
-    :returns:  str -- the code in plain text
-    :raises: None
-
-    """
-    binding = {
-        'tbl_id': tbl_id,
-        'priority': priority,
-        'match'   : match,
-        'actions' : actions,
-    }
-    return read_template('template/commands/pisces_commands.txt', binding)
-
-def ptp_header(version):
-    """
-    This method returns the ptp header definition
-    """
-    if version == 14:
-        return read_template('template/headers/ptp.txt')
-    else:
-         return read_template('template/headers/ptp_16.txt')
+    return read_template('template/headers/timestamp.txt')
 
 def parser_start(next_parser='parse_ethernet'):
     """

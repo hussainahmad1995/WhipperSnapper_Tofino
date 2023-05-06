@@ -13,14 +13,14 @@ def benchmark_add_header_overhead_16(action_name, nb_header):
     instruction_set =''
     for i in range(nb_header):
         instruction_set += '\t\thdr.header_%d.setValid();\n' % i
-    instruction_set += '\t\thdr.ptp.reserved2 = 8w1;'
+    instruction_set += '\t\thdr.timestamp.setValid();'
     return add_compound_action(action_name, '', instruction_set)
 
 def benchmark_remove_header_overhead_16(action_name, nb_header):
     instruction_set =''
     for i in range(nb_header):
         instruction_set += '\t\thdr.header_%d.setInvalid();\n' % i
-    instruction_set += '\t\thdr.ptp.reserved2 = 8w0;'
+    instruction_set += '\t\thdr.ptp.version = 8w0;'
     return add_compound_action(action_name, '', instruction_set)
 
 def benchmark_modify_header_overhead_16(action_name, nb_header):
@@ -99,7 +99,7 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
     out my_egress_metadata_t         meta,
     out egress_intrinsic_metadata_t  eg_intr_md
     """
-    program += add_egress_parser()
+    program += add_egress_parser(nb_headers)
 
     #Egress() control block arguments 
     egress_arguments = """    
@@ -123,10 +123,6 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
 
     egress_deparser_applies = '\t\tpacket.emit(hdr);\n'
     program += add_control_block_16('EgressDeparser', '', '', egress_deparser_applies, egress_deparser_arguments)
-
-    #Tofino does not support checksum
-    # program += add_control_block_16('verifyChecksum', '', '', '', 'inout headers hdr, inout metadata meta')
-    # program += add_control_block_16('computeChecksum', '', '', '', 'inout headers hdr, inout metadata meta')
 
     program += add_main_module()
 

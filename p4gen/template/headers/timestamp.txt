@@ -1,0 +1,4 @@
+header timestamp_t {
+    bit<48> time_value;
+    bit<16> version;
+}

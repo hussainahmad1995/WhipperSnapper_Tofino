@@ -20,7 +20,7 @@ def benchmark_remove_header_overhead_16(action_name, nb_header):
     instruction_set =''
     for i in range(nb_header):
         instruction_set += '\t\thdr.header_%d.setInvalid();\n' % i
-    instruction_set += '\t\thdr.ptp.version = 8w0;'
+    instruction_set += '\t\thdr.timestamp.setValid();'
     return add_compound_action(action_name, '', instruction_set)
 
 def benchmark_modify_header_overhead_16(action_name, nb_header):
@@ -110,7 +110,9 @@ def benchmark_modification_16(nb_headers, nb_fields, mod_type):
     inout egress_intrinsic_metadata_for_deparser_t     eg_dprsr_md,
     inout egress_intrinsic_metadata_for_output_port_t  eg_oport_md
     """
-    program += add_control_block_16('Egress', '', '', '', egress_arguments)
+
+    Egress_applies = "hdr.timestamp.time_value[31:0]= eg_prsr_md.global_tstamp[31:0] - hdr.timestamp.time_value[31:0];"
+    program += add_control_block_16('Egress', '', '',Egress_applies , egress_arguments)
 
     #EgressDeparser() block arguments and apply statements
 

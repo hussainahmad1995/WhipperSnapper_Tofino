@@ -201,7 +201,7 @@ def add_state_without_select(state_name, next_state):
 def add_state_type_3(state_name , next_state, header_name):
 
     binding = { 'state_name' : state_name , 'next_state' : next_state, 'header_name' : header_name }
-
+ 
     return read_template('template/parsers/state_type_3_16.txt', binding)
 
 def add_state_type_egress_parser(state_name, next_state,  header_name):

@@ -44,6 +44,8 @@
 # Vim tmp files
 *.swp
 
+# Tofino log files 
+*.log
 pktgen/build
 /output/
 

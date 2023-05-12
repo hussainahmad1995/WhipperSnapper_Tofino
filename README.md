@@ -82,11 +82,28 @@ TO MEASURE LATENCIES
 
 
 
-## Working
+## Packet processing
 The above script is to automate the testing of a feature completely. The actual process going on is
 1. The p4benchmark will produce the output directory to test certain feature.
-2. The main.p4 program will be compiled with p4c-bm2-ss compiler.
-3. tshark will monitor the interfaces being used by the switch, and to print timestamp to csv files.
+2. The main.p4 program will be compiled with tofino compiler.
+3. The main.p4 program will be loaded to the Tofino switch. 
+4. BF_Shell uses the python script in the folder tofino/headers_test/bfrt_python/fill_table_forward.py to populate tables in the Switch.
+5. Scapy python script is used to send packet on the interface exposed by the Tofino Switch(In our case we are using the port 64 to send packets).
+6. As the table_forward forward packet on the port 66, we will be using Scapy to sniff the packet on the port 66.
+
+## Latency measurements (using hardware timestamps)
+ 
+PTP : PTP(Precision Time protocol) usage is only relevant for the synchornizing the clocks betweens switches, as we are calculating the latency withing the same device we dont the Protocol. 
+Instead we use the Tofino timestamp metadata fields associated with each packet as it crosses each packet path namely the ingress parser, and egress parser.
+
+1. We are using a custom bridge header called timestamp header with a bit<48> time_value with a default value of 0.
+2. THe ingress_parser_timestamp which the Tofino timestamps when the ingress parser processing starts.
+3. The egress_parser_timestamp value which the Tofino timestamps when the egress parser processing starts.
+(Note - as we cannot carry metadata between ingress and egress parser, a bridge header gives us the functionality to carry ingress_parser_timestamp to the to process it in the egress processing)
+4. Any queueing can affect the timestamp values, so to ensure the Traffic Manager is not queuing the packet we will not overload the system.
+5. When the packet reaches the egress parser stage 
+
+
 4. A simple_switch will be setup with the main.json file and with some veth interfaces as its ports.
 5. RuntimeCLI will populate the match-action tables of simple_switch from commands.txt.
 6. The run_test.py file will send n copies of test.pcap file to simple_switch port.

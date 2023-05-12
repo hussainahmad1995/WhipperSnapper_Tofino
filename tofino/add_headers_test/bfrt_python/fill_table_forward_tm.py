@@ -33,8 +33,8 @@ test_table = p4.test_tbl
 #dst addr 3 represents the atlas 3 
 #dst addr 23 represents the atlas 23
 
-ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.3"),   port=148)
-ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.23"),   port=52)
+ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.3"),   port=1)
+ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.23"),   port=5)
 
 
 test_table.add_with_add_headers(dst_addr=IPAddress("10.0.0.3"))

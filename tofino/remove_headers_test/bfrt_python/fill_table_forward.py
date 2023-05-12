@@ -38,6 +38,8 @@ test_table = p4.test_tbl
 
 #entry represent veth-250 MAC addresss
 forward_table.add_with_forward(dstAddr=EUI("42:70:c7:3b:c5:2c"),   port=64)
+test_table.add_with_remove_headers(dstAddr=EUI("42:70:c7:3b:c5:2c"))
+
 bfrt.complete_operations()
 
 # Final programming

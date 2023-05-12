@@ -35,13 +35,12 @@ print("Press Ctrl-C to stop...")
 # packet = sniff(iface = iface)
 # print("The received packet length is ", packet.length)
 
-packet = sniff(count = 1 , iface=iface)[0]
-
-packet.show()
-
-print("The length of the packet after receving the packet " , len(packet))
-
-hexdump(packet)
+while(True):
+    packet = sniff(count = 1 , iface=iface)[0]
+    packet.show()
+    print(" \n Packet received =  " + str(len(packet)) + " bytes\n")
+    print("###[The latency incurred in the parser###] = " + str(packet[timestamp].time_value) +  " nanasecond \n")
+    hexdump(packet)
 
 
 

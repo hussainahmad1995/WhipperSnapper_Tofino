@@ -148,13 +148,22 @@ control Ingress(
         ig_dprsr_md.drop_ctl = 1;
     }    
 
+    table ipv4_lpm {
+        key     = { hdr.ipv4.dst_addr : lpm; }
+        actions = { forward; drop; }
+
+        default_action = forward(64); //CPU PORT
+        size           = 1000;
+    }
+
     table test_tbl {
+
+        key = {
+            hdr.ipv4.dst_addr: exact;
+        }
         actions = {
 			add_headers;
             drop;
-        }
-        key = {
-            hdr.ipv4.dst_addr: exact;
         }
         size = 1000;
     }
@@ -168,8 +177,12 @@ control Ingress(
         size = 1000;
     }
 
-    apply{
-		ipv4_host.apply();
+    apply
+    {   if (hdr.ipv4.isValid()) {
+            if (ipv4_host.apply().miss) {
+                ipv4_lpm.apply();
+            }
+        }
 		test_tbl.apply();
     }
 

@@ -29,12 +29,18 @@ clear_all(verbose=True)
 # #add entries to forward_table
 ipv4_host = p4.ipv4_host
 test_table = p4.test_tbl
+ipv4_lpm = p4.ipv4_lpm
 
 #dst addr 3 represents the atlas 3 
 #dst addr 23 represents the atlas 23
 
 ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.3"),   port=148)
 ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.23"),   port=52)
+
+
+ipv4_lpm.add_with_forward(dst_addr=IPAddress("10.0.0.3"), dst_addr_p_length=32 ,   port=148)
+ipv4_lpm.add_with_forward(dst_addr=IPAddress("10.0.0.23"), dst_addr_p_length=24 ,   port=52)
+
 
 
 test_table.add_with_add_headers(dst_addr=IPAddress("10.0.0.3"))

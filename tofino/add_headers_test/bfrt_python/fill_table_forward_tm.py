@@ -47,7 +47,7 @@ bfrt.complete_operations()
 print("""
 ******************* PROGAMMING RESULTS *****************
 """)
-print ("Table forward_table:")
+print ("Table ipv4_host:")
 ipv4_host.dump(table=True)
 print ("Table test_tbl:")
 test_table.dump(table=True)

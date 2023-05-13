@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import csv
 import os
 import sys
 from scapy.utils import hexdump
@@ -23,25 +24,32 @@ except:
 
 port = ""
 
-if iface == "enp4s0f0":
-    port = "64"
-if iface == "enp4s0f1":
-    port = "66"
+print("\nSniffing on " + str(iface) )
+print("\nPress Ctrl-C to stop...")
 
-print("Sniffing on ", iface , " port " , port)
-print("Press Ctrl-C to stop...")
+latency_list = []
+packet_count = 0 
+    
+packet = sniff(count = 1 , iface=iface)[0]
+packet.show()
 
-# packet = sniff(iface = iface)
-# packet = sniff(iface = iface)
-# print("The received packet length is ", packet.length)
-
-while(True):
+while(packet_count < 1000):
+    packet_count += 1
     packet = sniff(count = 1 , iface=iface)[0]
-    packet.show()
-    print(" \n Packet received =  " + str(len(packet)) + " bytes\n")
-    print("###[The latency incurred in the parser###] = " + str(packet[timestamp].time_value) +  " nanasecond \n")
-    hexdump(packet)
+    latency_list.append(packet[timestamp].time_value)
 
 
+packet.show()
+print(" \n Packet received =  " + str(len(packet)) + " bytes\n")
+print("###[Last latency value = ###] = " + str(packet[timestamp].time_value) +  " nanosecond \n")
+hexdump(packet)
 
+latency_sum = 0
+count = 0 
+for latency in latency_list:
+    count += 1 
+    latency_sum += latency
 
+average = latency_sum / count 
+
+print("Average latency is " , average)

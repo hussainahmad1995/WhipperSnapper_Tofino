@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import time
 import random
 import argparse
@@ -56,36 +55,37 @@ if __name__ == "__main__":
                         help = "Add [c] headers to each packet")
     parser.add_argument('-in' , '--interface' , default = "veth0" , type = str,
                             help = "Specify interface to send packets on")
-
-    parser.add_argument('-dip' , '--dst_ipaddr' , default = "10.0.0.3" , type = str , 
+    parser.add_argument('-dip' , '--dstipaddr' , default = "10.0.0.3" , type = str , 
                             help = "Specify dst addr of packet")
     parser.add_argument('-deth' , '--dst_macaddr' , default = "3c:fd:fe:c3:e4:28" , type = str , 
                             help = "Specify dst addr of packet")
-
     args = parser.parse_args()
     iface = args.interface
-
-    src_ip_addr = get_if_addr(iface)
+    #MAC address of the src interface
     src_mac_addr = get_if_hwaddr(iface)
-
-    dst_ip_addr =  args.dst_ipaddr
+    #MAC address of the src interface
     dst_mac_addr = args.dst_macaddr
+    #IP address of src interface
+    src_ip_addr = get_if_addr(iface)
+    #IP address of dst interface
+    dst_ip_addr =  args.dstipaddr
 
-    pkt = Ether(src = src_mac_addr , dst = dst_mac_addr ,type = 0x0800) / IP( src = src_ip_addr , dst = dst_ip_addr , proto = 100) / timestamp(time_value = 0, version = 0x778)
-    
+    #create a packet
+    pkt = Ether(src = src_mac_addr , dst = dst_mac_addr , type = 0x0800)  \
+        / IP( src = src_ip_addr , dst = dst_ip_addr , proto = 100)        \
+        / timestamp(time_value = 0, version = 0x778)
+
+    #print its length in bytes
     print(" \n Packet sent =  " + str(len(pkt)) + " bytes")
     pkt.show()
-    print("\nThe length of the packet before sending the packet : " + str(len(pkt)))
     print("\nNo of Custom headers sent = "  + str(args.nbheaders) + "\n")
-
     hexdump(pkt)
-
     print("Sending a packet to on interface  " , iface)
     #start timer for the packet send 
     start_time = time.time()
-    print("Start Timestamping before sending " , start_time)
+    print("Send packet time = " , start_time)
     reply = sendp(pkt , iface = iface , count = args.nbpackets)
     end_time = time.time()
-    print("End time before sending " , end_time)
+    print("Receive packet time =  " , end_time)
     latency = end_time - start_time  
-    print("The latency for the packet from scapy is " , latency)
+    print("Latency packet(scapy) = " , latency)

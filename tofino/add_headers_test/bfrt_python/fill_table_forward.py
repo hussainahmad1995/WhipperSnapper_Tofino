@@ -37,12 +37,6 @@ ipv4_lpm = p4.ipv4_lpm
 ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.3"),   port=148)
 ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.23"),   port=52)
 
-
-ipv4_lpm.add_with_forward(dst_addr=IPAddress("10.0.0.3"), dst_addr_p_length=32 ,   port=148)
-ipv4_lpm.add_with_forward(dst_addr=IPAddress("10.0.0.23"), dst_addr_p_length=24 ,   port=52)
-
-
-
 test_table.add_with_add_headers(dst_addr=IPAddress("10.0.0.3"))
 test_table.add_with_add_headers(dst_addr=IPAddress("10.0.0.23"))
 

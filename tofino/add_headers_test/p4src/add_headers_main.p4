@@ -100,8 +100,8 @@ parser IngressParser(
     state parse_ethernet {
         packet.extract(hdr.ethernet);
         transition select(hdr.ethernet.etherType) {
-		0x0800   : parse_ipv4;
-		default : accept;
+		    0x0800   : parse_ipv4;
+		    default : accept;
         }
     }
 
@@ -148,16 +148,8 @@ control Ingress(
         ig_dprsr_md.drop_ctl = 1;
     }    
 
-    table ipv4_lpm {
-        key     = { hdr.ipv4.dst_addr : lpm; }
-        actions = { forward; drop; }
-
-        default_action = forward(64); //CPU PORT
-        size           = 1000;
-    }
 
     table test_tbl {
-
         key = {
             hdr.ipv4.dst_addr: exact;
         }
@@ -177,11 +169,9 @@ control Ingress(
         size = 1000;
     }
 
-    apply
-    {   if (hdr.ipv4.isValid()) {
-            if (ipv4_host.apply().miss) {
-                ipv4_lpm.apply();
-            }
+    apply{ 
+        if (hdr.ipv4.isValid()) {
+            ipv4_host.apply();
         }
 		test_tbl.apply();
     }
@@ -221,8 +211,8 @@ parser EgressParser(
     state parse_ethernet {
         packet.extract(hdr.ethernet);
         transition select(hdr.ethernet.etherType) {
-		0x0800   : parse_ipv4;
-		default : accept;
+		    0x0800   : parse_ipv4;
+		    default : accept;
         }
     }
 

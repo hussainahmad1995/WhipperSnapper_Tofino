@@ -208,7 +208,7 @@ parser EgressParser(
     state parse_ethernet {
         packet.extract(hdr.ethernet);
         transition select(hdr.ethernet.etherType) {
-		0x800   : parse_ipv4;
+		0x0800   : parse_ipv4;
 		default : accept;
         }
     }
@@ -216,7 +216,7 @@ parser EgressParser(
     state parse_ipv4 {
         packet.extract(hdr.ipv4);
         transition select(hdr.ipv4.protocol){
-            0x1 : parse_timestamp;
+            100 : parse_timestamp;
             default : accept;
         }
     }

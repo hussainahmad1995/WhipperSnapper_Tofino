@@ -141,7 +141,6 @@ control Ingress(
 
     action forward(PortId_t port) {
         ig_tm_md.ucast_egress_port = port;
-        hdr.timestamp.time_value[31:0] = ig_prsr_md.global_tstamp[31:0];   
     }
     action drop() {
         ig_dprsr_md.drop_ctl = 1;
@@ -169,9 +168,12 @@ control Ingress(
 
     apply
     {   if (hdr.ipv4.isValid()) {
-        ipv4_host.apply();
+            ipv4_host.apply();
         }
-		test_tbl.apply();
+        if (hdr.timestamp.isValid()){
+            test_tbl.apply();
+            hdr.timestamp.time_value[31:0] = ig_prsr_md.global_tstamp[31:0];   
+        }
     }
 
 }

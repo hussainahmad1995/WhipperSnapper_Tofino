@@ -61,6 +61,21 @@ header header_0_t {
 // header header_9_t {
 // 	bit<16> field_0;
 // }
+// header header_10_t {
+// 	bit<16> field_0;
+// }
+// header header_11_t {
+// 	bit<16> field_0;
+// }
+// header header_12_t {
+// 	bit<16> field_0;
+// }
+// header header_13_t {
+// 	bit<16> field_0;
+// }
+// header header_14_t {
+// 	bit<16> field_0;
+// }
 
 struct metadata{
 	
@@ -79,6 +94,11 @@ struct my_ingress_headers_t{
 	// header_7_t header_7;
 	// header_8_t header_8;
 	// header_9_t header_9;
+    // header_10_t header_10;
+	// header_11_t header_11;
+	// header_12_t header_12;
+	// header_13_t header_13;
+	// header_14_t header_14;
 }
 struct my_ingress_metadata_t{
 
@@ -137,6 +157,12 @@ control Ingress(
 		// hdr.header_7.setValid();
 		// hdr.header_8.setValid();
 		// hdr.header_9.setValid();
+        // hdr.header_10.setValid();
+		// hdr.header_11.setValid();
+		// hdr.header_12.setValid();
+		// hdr.header_13.setValid();
+		// hdr.header_14.setValid();
+
     }
 
     action forward(PortId_t port) {
@@ -173,6 +199,7 @@ control Ingress(
         if (hdr.timestamp.isValid()){
             test_tbl.apply();
             hdr.timestamp.time_value[31:0] = ig_prsr_md.global_tstamp[31:0];   
+
         }
     }
 

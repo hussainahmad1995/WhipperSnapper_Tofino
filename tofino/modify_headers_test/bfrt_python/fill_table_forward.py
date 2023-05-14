@@ -1,7 +1,7 @@
 from netaddr import IPAddress
 from netaddr import EUI
 
-p4 = bfrt.add_headers_main.pipe.Ingress
+p4 = bfrt.mod_headers_main.pipe.Ingress
 
 # This function can clear all the tables and later on other fixed objects
 # once bfrt support is added.
@@ -34,10 +34,11 @@ test_table = p4.test_tbl
 #dst addr 23 represents the atlas 23
 
 ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.3"),   port=148)
-ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.23"),   port=52)
+ipv4_host.add_with_forward(dst_addr=IPAddress("10.0.0.23"),   port=164)
 
 test_table.add_with_add_headers(dst_addr=IPAddress("10.0.0.3"))
 test_table.add_with_add_headers(dst_addr=IPAddress("10.0.0.23"))
+
 
 
 bfrt.complete_operations()

@@ -5,17 +5,31 @@ header ethernet_t {
     bit<48> srcAddr;
     bit<16> etherType;
 }
+
+header ipv4_t {
+    bit<4>       version;
+    bit<4>       ihl;
+    bit<8>       diffserv;
+    bit<16>      total_len;
+    bit<16>      identification;
+    bit<3>       flags;
+    bit<13>      frag_offset;
+    bit<8>       ttl;
+    bit<8>       protocol;
+    bit<16>      hdr_checksum;
+    ipv4_addr_t  src_addr;
+    ipv4_addr_t  dst_addr;
+
+}
+
 header timestamp_t {
     bit<48> time_value;
     bit<16> version;
 }
 header header_0_t {
 	bit<16> field_0;
+}
 
-}
-header header_1_t {
-	bit<16> field_0;
-}
 struct metadata{
 	
 }
@@ -23,7 +37,6 @@ struct my_ingress_headers_t{
 	ethernet_t ethernet;
 	timestamp_t timestamp;
 	header_0_t header_0;
-	header_1_t header_1;
 
 }
 struct my_ingress_metadata_t{
@@ -45,34 +58,31 @@ parser IngressParser(
     state parse_ethernet {
         packet.extract(hdr.ethernet);
         transition select(hdr.ethernet.etherType) {
-		0x777   : parse_timestamp;
-		default : accept;
+		    0x0800   : parse_ipv4;
+		    default : accept;
+        }
+    }
 
+    state parse_ipv4 {
+        packet.extract(hdr.ipv4);
+        transition select(hdr.ipv4.protocol){
+            100 : parse_timestamp;
+            default : accept;
         }
     }
     state parse_timestamp {
         packet.extract(hdr.timestamp);
-        transition select(hdr.timestamp.version) {
-		0x778   : parse_header_0;
-		default : accept;
+        transition select(hdr.timestamp.version){
+            0 : parse_header_0; 
+            default : accept; 
+        }
 
-        }
+    state parser_header_0 { 
+        packet.extract
     }
-    state parse_header_0 {
-        packet.extract(hdr.header_0);
-        transition select(hdr.header_0.field_0) {
-		0x1000  : accept;
-		default : parse_header_1;
-
-        }
+        transition accept;
     }
-    state parse_header_1 {
-        packet.extract(hdr.header_1);
-        transition select(hdr.header_1.field_0) {
-		0x1001  : accept;
-		default : parse_header_2;
-        }
-    }
+ //dont need to parse header_0 because we are adding i
 
 }
 control Ingress(

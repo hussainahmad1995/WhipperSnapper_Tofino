@@ -1,5 +1,4 @@
 //currently adding one header only to an incoming packet
-// header_0 is added to each packet
 
 #include <core.p4>
 #include <tna.p4>
@@ -140,14 +139,12 @@ control Ingress(
 		// hdr.header_9.setValid();
     }
 
-    action forward(bit<9> port) {
+    action forward(PortId_t port) {
         ig_tm_md.ucast_egress_port = port;
-        hdr.timestamp.time_value[31:0] = ig_prsr_md.global_tstamp[31:0];   
     }
     action drop() {
         ig_dprsr_md.drop_ctl = 1;
     }    
-
 
     table test_tbl {
         key = {
@@ -169,11 +166,14 @@ control Ingress(
         size = 1000;
     }
 
-    apply{ 
-        if (hdr.ipv4.isValid()) {
+    apply
+    {   if (hdr.ipv4.isValid()) {
             ipv4_host.apply();
         }
-		test_tbl.apply();
+        if (hdr.timestamp.isValid()){
+            test_tbl.apply();
+            hdr.timestamp.time_value[31:0] = ig_prsr_md.global_tstamp[31:0];   
+        }
     }
 
 }

@@ -32,48 +32,48 @@ header timestamp_t {
 header header_0_t {
 	bit<16> field_0;
 }
-header header_1_t {
-	bit<16> field_0;
-}
-header header_2_t {
-	bit<16> field_0;
-}
-header header_3_t {
-	bit<16> field_0;
-}
-header header_4_t {
-	bit<16> field_0;
-}
-header header_5_t {
-	bit<16> field_0;
-}
-header header_6_t {
-	bit<16> field_0;
-}
-header header_7_t {
-	bit<16> field_0;
-}
-header header_8_t {
-	bit<16> field_0;
-}
-header header_9_t {
-	bit<16> field_0;
-}
-header header_10_t {
-	bit<16> field_0;
-}
-header header_11_t {
-	bit<16> field_0;
-}
-header header_12_t {
-	bit<16> field_0;
-}
-header header_13_t {
-	bit<16> field_0;
-}
-header header_14_t {
-	bit<16> field_0;
-}
+// header header_1_t {
+// 	bit<16> field_0;
+// }
+// header header_2_t {
+// 	bit<16> field_0;
+// }
+// header header_3_t {
+// 	bit<16> field_0;
+// }
+// header header_4_t {
+// 	bit<16> field_0;
+// }
+// header header_5_t {
+// 	bit<16> field_0;
+// }
+// header header_6_t {
+// 	bit<16> field_0;
+// }
+// header header_7_t {
+// 	bit<16> field_0;
+// }
+// header header_8_t {
+// 	bit<16> field_0;
+// }
+// header header_9_t {
+// 	bit<16> field_0;
+// }
+// header header_10_t {
+// 	bit<16> field_0;
+// }
+// header header_11_t {
+// 	bit<16> field_0;
+// }
+// header header_12_t {
+// 	bit<16> field_0;
+// }
+// header header_13_t {
+// 	bit<16> field_0;
+// }
+// header header_14_t {
+// 	bit<16> field_0;
+// }
 
 
 struct metadata{
@@ -84,20 +84,20 @@ struct my_ingress_headers_t{
     ipv4_t ipv4;
 	timestamp_t timestamp;
 	header_0_t header_0;
-    header_1_t header_1;
-	header_2_t header_2;
-	header_3_t header_3;
-	header_4_t header_4;
-    header_5_t header_5;
-	header_6_t header_6;
-	header_7_t header_7;
-	header_8_t header_8;
-	header_9_t header_9;
-    header_10_t header_10;
-	header_11_t header_11;
-	header_12_t header_12;
-	header_13_t header_13;
-	header_14_t header_14;
+    // header_1_t header_1;
+	// header_2_t header_2;
+	// header_3_t header_3;
+	// header_4_t header_4;
+    // header_5_t header_5;
+	// header_6_t header_6;
+	// header_7_t header_7;
+	// header_8_t header_8;
+	// header_9_t header_9;
+    // header_10_t header_10;
+	// header_11_t header_11;
+	// header_12_t header_12;
+	// header_13_t header_13;
+	// header_14_t header_14;
 
 }
 struct my_ingress_metadata_t{
@@ -141,71 +141,76 @@ parser IngressParser(
         packet.extract(hdr.header_0);
         transition parse_header_1;
     }
-    state parse_header_1 {
-        packet.extract(hdr.header_1);
-        transition parse_header_2;
-    }
-    state parse_header_2 {
-        packet.extract(hdr.header_2);
-        transition parse_header_3;
-    }
-    state parse_header_3 {
-        packet.extract(hdr.header_3);
-        transition parse_header_4;
-    }
-    state parse_header_4 {
-        packet.extract(hdr.header_4);
-        transition parse_header_5;
-    }
-    state parse_header_5 {
-        packet.extract(hdr.header_5);
-        transition parse_header_6;
-    }
-    state parse_header_6 {
-        packet.extract(hdr.header_6);
-        transition parse_header_7;
-    }
-    state parse_header_7 {
-        packet.extract(hdr.header_7);
-        transition parse_header_8;
-    }
-    state parse_header_8 {
-        packet.extract(hdr.header_8);
-        transition parse_header_9;
-    }
-    state parse_header_9 {
-        packet.extract(hdr.header_9);
-        transition parse_header_10;
-    }
-    state parse_header_10 {
-        packet.extract(hdr.header_10);
-        transition parse_header_11;
-    }
+    // state parse_header_1 {
+    //     packet.extract(hdr.header_1);
+    //     transition parse_header_2;
+    // }
+    // state parse_header_2 {
+    //     packet.extract(hdr.header_2);
+    //     transition parse_header_3;
+    // }
+    // state parse_header_3 {
+    //     packet.extract(hdr.header_3);
+    //     transition parse_header_4;
+    // }
+    // state parse_header_4 {
+    //     packet.extract(hdr.header_4);
+    //     transition parse_header_5;
+    // }
+    
+    // state parse_header_5 {
+    //     packet.extract(hdr.header_5);
+    //     transition accept;
+    // }
+    
+}
 
-    state parse_header_11 {
-        packet.extract(hdr.header_11);
-        transition parse_header_12;
-    }
+    
+//     state parse_header_6 {
+//         packet.extract(hdr.header_6);
+//         transition parse_header_7;
+//     }
+//     state parse_header_7 {
+//         packet.extract(hdr.header_7);
+//         transition parse_header_8;
+//     }
+//     state parse_header_8 {
+//         packet.extract(hdr.header_8);
+//         transition parse_header_9;
+//     }
+//     state parse_header_9 {
+//         packet.extract(hdr.header_9);
+//         transition parse_header_10;
+//     }
+//     state parse_header_10 {
+//         packet.extract(hdr.header_10);
+//         transition parse_header_11;
+//     }
 
-    state parse_header_12 {
-        packet.extract(hdr.header_12);
-        transition parse_header_13;
-    }
+//     state parse_header_11 {
+//         packet.extract(hdr.header_11);
+//         transition parse_header_12;
+//     }
 
-    state parse_header_13 {
-        packet.extract(hdr.header_13);
-        transition parse_header_14;
-    }
+//     state parse_header_12 {
+//         packet.extract(hdr.header_12);
+//         transition parse_header_13;
+//     }
+
+//     state parse_header_13 {
+//         packet.extract(hdr.header_13);
+//         transition parse_header_14;
+//     }
    
-   state parse_header_14 {
-        packet.extract(hdr.header_14);
-        transition accept;
-    }
+//    state parse_header_14 {
+//         packet.extract(hdr.header_14);
+//         transition accept;
+//     }
     
 
  //dont need to parse header_0 because we are adding i
 
-}
+
 control Ingress(
         inout my_ingress_headers_t                          hdr,
         inout my_ingress_metadata_t                         meta,
@@ -216,20 +221,20 @@ control Ingress(
 	
     action remove_headers() {
 		hdr.header_0.setInvalid();
-		hdr.header_1.setInvalid();
-		hdr.header_2.setInvalid();
-		hdr.header_3.setInvalid();
-		hdr.header_4.setInvalid();
-		hdr.header_5.setInvalid();
-		hdr.header_6.setInvalid();
-		hdr.header_7.setInvalid();
-		hdr.header_8.setInvalid();
-		hdr.header_9.setInvalid();
-        hdr.header_10.setInvalid();
-		hdr.header_11.setInvalid();
-		hdr.header_12.setInvalid();
-		hdr.header_13.setInvalid();
-    	hdr.header_14.setInvalid();
+		// hdr.header_1.setInvalid();
+		// hdr.header_2.setInvalid();
+		// hdr.header_3.setInvalid();
+		// hdr.header_4.setInvalid();
+		// hdr.header_5.setInvalid();
+		// hdr.header_6.setInvalid();
+		// hdr.header_7.setInvalid();
+		// hdr.header_8.setInvalid();
+		// hdr.header_9.setInvalid();
+        // hdr.header_10.setInvalid();
+		// hdr.header_11.setInvalid();
+		// hdr.header_12.setInvalid();
+		// hdr.header_13.setInvalid();
+    	// hdr.header_14.setInvalid();
     }
 
     action forward(bit<9> port) {
@@ -277,25 +282,7 @@ control IngressDeparser(
         in    ingress_intrinsic_metadata_for_deparser_t  ig_dprsr_md) {
 	
     apply{
-        packet.emit(hdr.ethernet);
-        packet.emit(hdr.ipv4);
-        packet.emit(hdr.timestamp);
-        packet.emit(hdr.header_0);
-        packet.emit(hdr.header_1);
-        packet.emit(hdr.header_2);
-        packet.emit(hdr.header_3);
-        packet.emit(hdr.header_4);
-        packet.emit(hdr.header_5);
-        packet.emit(hdr.header_6);
-        packet.emit(hdr.header_7);
-        packet.emit(hdr.header_8);
-        packet.emit(hdr.header_9);
-        packet.emit(hdr.header_10);
-        packet.emit(hdr.header_11);
-        packet.emit(hdr.header_12);
-        packet.emit(hdr.header_13);
-        packet.emit(hdr.header_14);
-
+        packet.emit(hdr);
     }
 }
 struct my_egress_metadata_t{

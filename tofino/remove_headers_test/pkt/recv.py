@@ -1,7 +1,13 @@
 #!/usr/bin/python3
 
+import csv
 import os
 import sys
+from scapy.utils import hexdump
+from send_packet_remove import timestamp
+from send_packet_remove import headers
+# from send_packet_add import add_layers.header
+
 
 if os.getuid() !=0:
     print("""
@@ -16,14 +22,35 @@ try:
 except:
     iface="veth1"
 
-port = 0 
+port = ""
 
-if iface == "enp4s0f0":
-    port = "64"
-if iface == "enp4s0f1":
-    port = "66"
+print("\nSniffing on " + str(iface) )
+print("\nPress Ctrl-C to stop...")
 
-print("Sniffing on ", iface , " port " , port)
-print("Press Ctrl-C to stop...")
-sniff(iface=iface, prn=lambda p: p.show())
-sniff(iface=iface, prn=lambda p: p.summary())
+latency_list = []
+packet_count = 0 
+    
+packet = sniff(count = 1 , iface=iface, filter = "ip proto 100")[0]
+packet.show()
+hexdump(packet)
+print(" \n Packet received =  " + str(len(packet)) + " bytes\n")
+
+while(packet_count < 1000):
+    packet_count += 1
+    packet = sniff(count = 1 , iface=iface, filter = "ip proto 100")[0]
+    latency_list.append(packet[timestamp].time_value)
+
+
+packet.show()
+print("###[Last latency value = ###] = " + str(packet[timestamp].time_value) +  " nanosecond \n")
+hexdump(packet)
+
+latency_sum = 0
+count = 0 
+for latency in latency_list:
+    count += 1 
+    latency_sum += latency
+
+average = latency_sum / count 
+
+print("\n\n ###Average latency for 1000 packets ### = \n\n" , average)

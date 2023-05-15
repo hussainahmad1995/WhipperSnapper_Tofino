@@ -30,17 +30,17 @@ print("\nPress Ctrl-C to stop...")
 latency_list = []
 packet_count = 0 
     
-packet = sniff(count = 1 , iface=iface)[0]
+packet = sniff(count = 1 , iface=iface, filter = "ip proto 100")[0]
 packet.show()
+print(" \n Packet received =  " + str(len(packet)) + " bytes\n")
 
 while(packet_count < 1000):
     packet_count += 1
-    packet = sniff(count = 1 , iface=iface)[0]
+    packet = sniff(count = 1 , iface=iface, filter = "ip proto 100")[0]
     latency_list.append(packet[timestamp].time_value)
 
 
 packet.show()
-print(" \n Packet received =  " + str(len(packet)) + " bytes\n")
 print("###[Last latency value = ###] = " + str(packet[timestamp].time_value) +  " nanosecond \n")
 hexdump(packet)
 
@@ -52,4 +52,4 @@ for latency in latency_list:
 
 average = latency_sum / count 
 
-print("Average latency is " , average)
+print("\n\n ###Average latency for 1000 packets ### = \n\n" , average)
